@@ -1,0 +1,13 @@
+/* Navbar background */
+.navbar {
+  background-color: #3255A1
+}
+
+.rounded {
+  border-radius: 30%;
+}
+
+.my-5 li {
+  font-family: Georgia, serif;
+  line-height: 1.6;     /* nice spacing */
+}

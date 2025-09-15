@@ -1,37 +1,22 @@
 ---
-title: Welcome :D 
+title: ""
 ---
 
 ::: {.my-5}
-## Hey, I’m Sabrina! 
+# Welcome :D \
 
-I’m a first-semester **Master’s student in Business Analytics at [Baruch College](https://www.baruch.cuny.edu/)**.  This site showcases my work and projects from my course, *Basic Software Tools for Data Analytics.* 
+![](image/intro.png){.rounded}
 
-I’m *from Brazil*, although both my parents are Chinese. In my free time, I *enjoy watching movies and TV shows, drawing*, and *playing games*.
+I’m currently pursuing a **Master's in Business Analytics** at [Baruch College](https://www.baruch.cuny.edu/). On this site, you’ll find projects completed during my master's program. 
+\
+
+#### A little about me
+
+- I’m *from Brazil*, although both my parents are Chinese. 
+- I *enjoy exploring* new ideas and bringing together data and creative design to tackle meaningful problems.
+- In my *free time*, I enjoy watching movies and TV shows, drawing, and playing games.
 :::
 
-```{r}
-#| echo: false
-#| message: false
-#| warning: false
-
-if (!require("leaflet")) {
-  options(repos = c(CRAN = "https://cloud.r-project.org"))
-  install.packages("leaflet")
-  stopifnot(require("leaflet"))
-}
-
-baruch_longitude <- -73.98333
-baruch_latitude <- +40.75028
-
-leaflet() |>
-  addTiles() |>
-  setView(baruch_longitude, baruch_latitude, zoom = 17) |>
-  addPopups(
-    baruch_longitude, baruch_latitude,
-    "I am a Master's student at <b>Baruch College</b>!"
-  )
-```
 
 ```{r}
 #| include: false
