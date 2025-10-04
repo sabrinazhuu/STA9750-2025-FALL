@@ -13,9 +13,11 @@ website:
     
 format:
   html:
-    theme: litera
+    theme: zephyr
     css: style.css
-    toc: false
+    toc: true
+    code-fold: true
+    code-summary: "Show the code"
 
 editor:
   mode: source
