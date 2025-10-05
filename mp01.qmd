@@ -10,7 +10,7 @@ date: "`r Sys.Date()`"
 #| include: false
 
 # Load required packages
-if(!require("tidyverse")) install.packages("tidyverse")
+if (!require("tidyverse")) install.packages("tidyverse")
 library(readr)
 library(dplyr)
 library(stringr)
@@ -113,7 +113,7 @@ To begin the analysis, I prepared the Netflix data by importing the files, explo
 
 ```{r import}
 # Importing libraries
-if(!require("tidyverse")) install.packages("tidyverse")
+if (!require("tidyverse")) install.packages("tidyverse")
 library(readr)
 library(dplyr)
 library(stringr)
@@ -122,39 +122,41 @@ library(knitr)
 library(lubridate)
 
 # Read and Clean Data
-format_titles <- function(df){
+format_titles <- function(df) {
   colnames(df) <- str_replace_all(colnames(df), "_", " ") |> str_to_title()
   df
 }
 
-    # GLOBAL TOP 10
+# GLOBAL TOP 10
 GLOBAL_TOP_10 <- read_tsv(GLOBAL_TOP_10_FILENAME, show_col_types = FALSE) |>
   mutate(season_title = if_else(season_title == "N/A", NA_character_, season_title))
 
-    # COUNTRY TOP 10
+# COUNTRY TOP 10
 COUNTRY_TOP_10 <- read_tsv(COUNTRY_TOP_10_FILENAME, show_col_types = FALSE) |>
   mutate(season_title = if_else(season_title == "N/A", NA_character_, season_title))
 ```
 
 ### Global Top 10 Dataset 
 ```{r GLobal Data}
-GLOBAL_TOP_10 |> 
+GLOBAL_TOP_10 |>
   mutate(`runtime_(minutes)` = round(60 * runtime)) |>
-  select(-season_title, 
-         -runtime) |>
+  select(
+    -season_title,
+    -runtime
+  ) |>
   format_titles() |>
-  head(n=10) |>
-  datatable(options=list(searching=TRUE, info=FALSE)) |>
-  formatRound(c('Weekly Hours Viewed', 'Weekly Views'))
+  head(n = 10) |>
+  datatable(options = list(searching = TRUE, info = FALSE)) |>
+  formatRound(c("Weekly Hours Viewed", "Weekly Views"))
 ```
 
 ### Country-Wide Top 10 Dataset 
 ```{r Country Data}
-COUNTRY_TOP_10 |> 
+COUNTRY_TOP_10 |>
   select(-country_iso2, -season_title) |>
   format_titles() |>
-  head(n=10) |>
-  datatable(options=list(searching=TRUE, info=FALSE))
+  head(n = 10) |>
+  datatable(options = list(searching = TRUE, info = FALSE))
 ```
 
 
@@ -188,8 +190,12 @@ all_countries_data <- COUNTRY_TOP_10 |>
   arrange(desc(unique_titles))
 
 # Extract top country info
-top_country <- all_countries_data |> slice(1) |> pull(country_name)
-top_country_titles <- all_countries_data |> slice(1) |> pull(unique_titles)
+top_country <- all_countries_data |>
+  slice(1) |>
+  pull(country_name)
+top_country_titles <- all_countries_data |>
+  slice(1) |>
+  pull(unique_titles)
 
 # Display with datatable
 all_countries_data |>
@@ -246,10 +252,11 @@ top_viewership_data <- GLOBAL_TOP_10 |>
   arrange(desc(hours_millions))
 
 # Create a summary table
-kable(top_viewership_data |> 
-        select(category, show_title, hours_millions),
-      col.names = c("Category", "Show Title", "Total Hours Viewed (Millions)"),
-      align = "l"
+kable(
+  top_viewership_data |>
+    select(category, show_title, hours_millions),
+  col.names = c("Category", "Show Title", "Total Hours Viewed (Millions)"),
+  align = "l"
 )
 ```
 
@@ -364,10 +371,10 @@ Not every hit begins at the very top. **`r num_climbers` films** started below N
 
 ```{r}
 tv_debut_weeks <- COUNTRY_TOP_10 |>
-  filter(category == "TV") |>  # Try just "TV" if that's what your data has
+  filter(category == "TV") |> # Try just "TV" if that's what your data has
   group_by(show_title) |>
   summarise(debut_week = min(week, na.rm = TRUE), .groups = "drop") |>
-  filter(is.finite(debut_week))  # Remove any shows with no valid weeks
+  filter(is.finite(debut_week)) # Remove any shows with no valid weeks
 
 # Count countries in debut week for each show
 tv_debut_countries <- COUNTRY_TOP_10 |>
@@ -484,8 +491,9 @@ stranger_things_data <- GLOBAL_TOP_10 |>
   select(season_title, hours_millions, cumulative_weeks)
 
 kable(stranger_things_data,
-      col.names = c("Season", "Total Hours (Millions)", "Weeks in Top 10"),
-      align = c("l", "r", "r"))
+  col.names = c("Season", "Total Hours (Millions)", "Weeks in Top 10"),
+  align = c("l", "r", "r")
+)
 ```
 
 \
@@ -519,7 +527,7 @@ When it comes to films, Indian audiences continue to show strong loyalty to home
 
 ```{r}
 #| tbl-cap: "Top 10 films in India"
-#| 
+#|
 # Top 10 films in India
 india_top10_films <- COUNTRY_TOP_10 |>
   filter(country_name == "India", category == "Films") |>
