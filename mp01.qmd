@@ -56,6 +56,7 @@ COUNTRY_TOP_10 <- read_tsv(COUNTRY_TOP_10_FILENAME)
 COUNTRY_TOP_10 <- COUNTRY_TOP_10 |>
   mutate(season_title = if_else(season_title == "N/A", NA_character_, season_title))
 ```
+\
 
 Netflix has become a global stage for stories that connects audiences across cultures. With its investment in original films and series, the platform continues to deliver content that is both high-quality and broadly popular. As a Data Analyst supporting Netflix’s Public Relations team, this project focuses on analyzing Netflix’s Top 10 data to uncover key insights behind the platform’s most successful titles.
 
@@ -707,6 +708,7 @@ datatable(
   colnames = c("Show Title", "Total Weeks in Top 10"),
   options = list(
     dom = "t",
+    ordering = FALSE,
     pageLength = 10,
     rowCallback = JS(
       paste0("function(row, data, index) {
@@ -771,6 +773,7 @@ datatable(
   colnames = c("Show Title", "Category", "Weeks in Top 10"),
   options = list(
     dom = "t",
+    ordering = FALSE,
     pageLength = 10,
     rowCallback = JS(
       paste0("function(row, data, index) {
@@ -835,6 +838,7 @@ datatable(
   top3_films |> select(Film = show_title, `Total Views (Millions)` = views_millions),
   options = list(
     dom = "t",
+    ordering = FALSE,
     pageLength = 3,
     rowCallback = JS(
       "function(row, data, index) {
@@ -854,6 +858,7 @@ datatable(
   top3_tv |> select(`TV Show` = show_title, `Total Views (Millions)` = views_millions),
   options = list(
     dom = "t",
+    ordering = FALSE,
     pageLength = 3,
     rowCallback = JS(
       "function(row, data, index) {
@@ -910,6 +915,7 @@ datatable(
     dom = "t",
     searching = FALSE,
     info = FALSE,
+    ordering = FALSE,
     rowCallback = JS(
       paste0("function(row, data, index) {
         if ([", paste(highlight_rows, collapse = ","), "].includes(index)) {
