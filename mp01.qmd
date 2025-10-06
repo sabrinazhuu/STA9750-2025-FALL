@@ -69,7 +69,7 @@ Netflix has become a global stage for stories that connects audiences across cul
 
 **Project Structure**
 
-- **Part 1:** Data Preparation — Importing, cleaning, and organizing Netflix Top 10 data.
+- **Part 1:** Data Preparation — Importing, cleaning, and organizing Netflix's Top 10 data.
 - **Part 2:** Exploratory Questions — Investigating key trends and insights from the Top 10 data.
 - **Part 3:** Press Releases — Spotlighting Netflix’s biggest hits and milestones.
 :::
@@ -508,7 +508,7 @@ tv_season_debut_weeks <- COUNTRY_TOP_10 |>
   filter(category == "TV") |>
   group_by(show_title, season_title) |>
   summarise(debut_week = min(week, na.rm = TRUE), .groups = "drop") |>
-  filter(is.finite(debut_week)) 
+  filter(is.finite(debut_week))
 
 # Countries in debut week for each show/season
 tv_season_debut_countries <- COUNTRY_TOP_10 |>
@@ -711,10 +711,10 @@ datatable(
   caption = "Top 10 Films in India"
 ) |>
   formatStyle(
-    'show_title',
-    target = 'row',
-    backgroundColor = styleEqual(highlight_titles, rep('#fff2d9', length(highlight_titles))),
-    fontWeight = styleEqual(highlight_titles, rep('bold', length(highlight_titles)))
+    "show_title",
+    target = "row",
+    backgroundColor = styleEqual(highlight_titles, rep("#fff2d9", length(highlight_titles))),
+    fontWeight = styleEqual(highlight_titles, rep("bold", length(highlight_titles)))
   )
 ```
 
@@ -772,10 +772,10 @@ datatable(
   caption = "India-only Top 10 Titles"
 ) |>
   formatStyle(
-    'show_title',
-    target = 'row',
-    backgroundColor = styleEqual(highlight_titles, rep('#ebfaec', length(highlight_titles))),
-    fontWeight = styleEqual(highlight_titles, rep('bold', length(highlight_titles)))
+    "show_title",
+    target = "row",
+    backgroundColor = styleEqual(highlight_titles, rep("#ebfaec", length(highlight_titles))),
+    fontWeight = styleEqual(highlight_titles, rep("bold", length(highlight_titles)))
   )
 ```
 [`r india_only_count`]{#india_count}
@@ -827,7 +827,7 @@ According to the data, **`r top_film_1`**  and **`r top_tv_1`** have claimed the
 top_film <- top3_films$show_title[1]
 
 datatable(
-  top3_films |> 
+  top3_films |>
     select(Film = show_title, `Total Views (Millions)` = views_millions),
   options = list(
     dom = "t",
@@ -837,17 +837,17 @@ datatable(
   caption = "Top 3 Most Watched Films Globally"
 ) |>
   formatStyle(
-    'Film',
-    target = 'row',
-    backgroundColor = styleEqual(top_film, '#dbe5ff'),
-    fontWeight = styleEqual(top_film, 'bold')
+    "Film",
+    target = "row",
+    backgroundColor = styleEqual(top_film, "#dbe5ff"),
+    fontWeight = styleEqual(top_film, "bold")
   )
 
 # Table for TV shows
 top_tv_show <- top3_tv$show_title[1]
 
 datatable(
-  top3_tv |> 
+  top3_tv |>
     select(`TV Show` = show_title, `Total Views (Millions)` = views_millions),
   options = list(
     dom = "t",
@@ -857,10 +857,10 @@ datatable(
   caption = "Top 3 Most Watched TV Shows Globally"
 ) |>
   formatStyle(
-    'TV Show',
-    target = 'row',
-    backgroundColor = styleEqual(top_tv_show, '#dbe5ff'),
-    fontWeight = styleEqual(top_tv_show, 'bold')
+    "TV Show",
+    target = "row",
+    backgroundColor = styleEqual(top_tv_show, "#dbe5ff"),
+    fontWeight = styleEqual(top_tv_show, "bold")
   )
 ```
 \
@@ -893,7 +893,13 @@ top_nonenglish_weeks_hours <- top10_nonenglish_weeks |>
   slice(1) |>
   pull(hours_millions)
 
-highlighted_shows <- c("Squid Game", "Alchemy of Souls", "Extraordinary Attorney Woo", "Hometown Cha-Cha-Cha", "Queen of Tears")
+highlighted_shows <- c(
+  "Squid Game",
+  "Alchemy of Souls",
+  "Extraordinary Attorney Woo",
+  "Hometown Cha-Cha-Cha",
+  "Queen of Tears"
+)
 
 datatable(
   top10_nonenglish_weeks |> select(show_title, cumulative_weeks, hours_millions),
@@ -906,10 +912,10 @@ datatable(
   )
 ) |>
   formatStyle(
-    'show_title',
-    target = 'row',
-    backgroundColor = styleEqual(highlighted_shows, rep('#dbe5ff', length(highlighted_shows))),
-    fontWeight = styleEqual(highlighted_shows, rep('bold', length(highlighted_shows)))
+    "show_title",
+    target = "row",
+    backgroundColor = styleEqual(highlighted_shows, rep("#dbe5ff", length(highlighted_shows))),
+    fontWeight = styleEqual(highlighted_shows, rep("bold", length(highlighted_shows)))
   )
 ```
 \
@@ -917,6 +923,7 @@ datatable(
 From heartfelt storytelling to striking visuals, Korean creators have found the perfect recipe for stories that resonate everywhere. It’s clear that K-dramas aren’t just trending, they’ve become a powerful force shaping what the world loves to watch.
 
 \
+
 ---
 
 # Thanks for Reading!
