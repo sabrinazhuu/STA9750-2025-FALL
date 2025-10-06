@@ -700,28 +700,22 @@ highlight_titles <- c(
   "Mimi"
 )
 
-highlight_rows <- which(india_top10_films$show_title %in% highlight_titles) - 1
-
 # Table
 datatable(
   india_top10_films,
   colnames = c("Show Title", "Total Weeks in Top 10"),
   options = list(
     dom = "t",
-    ordering = FALSE,
-    pageLength = 10,
-    rowCallback = JS(
-      paste0("function(row, data, index) {
-        if ([", paste(highlight_rows, collapse = ","), "].includes(index)) {
-          $(row).css('background-color', '#fff2d9');
-          $(row).css('font-weight', 'bold');
-        }
-      }")
-    )
+    pageLength = 10
   ),
-  rownames = FALSE,
   caption = "Top 10 Films in India"
-)
+) |>
+  formatStyle(
+    'show_title',
+    target = 'row',
+    backgroundColor = styleEqual(highlight_titles, rep('#fff2d9', length(highlight_titles))),
+    fontWeight = styleEqual(highlight_titles, rep('bold', length(highlight_titles)))
+  )
 ```
 
 \
@@ -773,20 +767,16 @@ datatable(
   colnames = c("Show Title", "Category", "Weeks in Top 10"),
   options = list(
     dom = "t",
-    ordering = FALSE,
-    pageLength = 10,
-    rowCallback = JS(
-      paste0("function(row, data, index) {
-        if ([", paste(highlight_rows, collapse = ","), "].includes(index)) {
-          $(row).css('background-color', '#ebfaec');
-          $(row).css('font-weight', 'bold');
-        }
-      }")
-    )
+    pageLength = 10
   ),
-  rownames = FALSE,
   caption = "India-only Top 10 Titles"
-)
+) |>
+  formatStyle(
+    'show_title',
+    target = 'row',
+    backgroundColor = styleEqual(highlight_titles, rep('#ebfaec', length(highlight_titles))),
+    fontWeight = styleEqual(highlight_titles, rep('bold', length(highlight_titles)))
+  )
 ```
 [`r india_only_count`]{#india_count}
 
@@ -834,44 +824,44 @@ According to the data, **`r top_film_1`**  and **`r top_tv_1`** have claimed the
 
 ```{r}
 # Table for films
+top_film <- top3_films$show_title[1]
+
 datatable(
-  top3_films |> select(Film = show_title, `Total Views (Millions)` = views_millions),
+  top3_films |> 
+    select(Film = show_title, `Total Views (Millions)` = views_millions),
   options = list(
     dom = "t",
-    ordering = FALSE,
-    pageLength = 3,
-    rowCallback = JS(
-      "function(row, data, index) {
-        if (index === 0) {
-          $(row).css('background-color', '#dbe5ff');
-          $(row).css('font-weight', 'bold');
-        }
-      }"
-    )
+    searching = FALSE,
+    info = FALSE
   ),
-  rownames = FALSE,
   caption = "Top 3 Most Watched Films Globally"
-)
+) |>
+  formatStyle(
+    'Film',
+    target = 'row',
+    backgroundColor = styleEqual(top_film, '#dbe5ff'),
+    fontWeight = styleEqual(top_film, 'bold')
+  )
 
 # Table for TV shows
+top_tv_show <- top3_tv$show_title[1]
+
 datatable(
-  top3_tv |> select(`TV Show` = show_title, `Total Views (Millions)` = views_millions),
+  top3_tv |> 
+    select(`TV Show` = show_title, `Total Views (Millions)` = views_millions),
   options = list(
     dom = "t",
-    ordering = FALSE,
-    pageLength = 3,
-    rowCallback = JS(
-      "function(row, data, index) {
-        if (index === 0) {
-          $(row).css('background-color', '#dbe5ff');
-          $(row).css('font-weight', 'bold');
-        }
-      }"
-    )
+    searching = FALSE,
+    info = FALSE
   ),
-  rownames = FALSE,
   caption = "Top 3 Most Watched TV Shows Globally"
-)
+) |>
+  formatStyle(
+    'TV Show',
+    target = 'row',
+    backgroundColor = styleEqual(top_tv_show, '#dbe5ff'),
+    fontWeight = styleEqual(top_tv_show, 'bold')
+  )
 ```
 \
 
@@ -904,9 +894,7 @@ top_nonenglish_weeks_hours <- top10_nonenglish_weeks |>
   pull(hours_millions)
 
 highlighted_shows <- c("Squid Game", "Alchemy of Souls", "Extraordinary Attorney Woo", "Hometown Cha-Cha-Cha", "Queen of Tears")
-highlight_rows <- which(top10_nonenglish_weeks$show_title %in% highlighted_shows) - 1 # DT uses 0-based indexing
 
-# Table
 datatable(
   top10_nonenglish_weeks |> select(show_title, cumulative_weeks, hours_millions),
   colnames = c("TV Show Title", "Cumulative Weeks in Top 10", "Total Hours Viewed (Millions)"),
@@ -914,18 +902,15 @@ datatable(
   options = list(
     dom = "t",
     searching = FALSE,
-    info = FALSE,
-    ordering = FALSE,
-    rowCallback = JS(
-      paste0("function(row, data, index) {
-        if ([", paste(highlight_rows, collapse = ","), "].includes(index)) {
-          $(row).css('background-color', '#dbe5ff');
-          $(row).css('font-weight', 'bold');
-        }
-      }")
-    )
+    info = FALSE
   )
-)
+) |>
+  formatStyle(
+    'show_title',
+    target = 'row',
+    backgroundColor = styleEqual(highlighted_shows, rep('#dbe5ff', length(highlighted_shows))),
+    fontWeight = styleEqual(highlighted_shows, rep('bold', length(highlighted_shows)))
+  )
 ```
 \
 
