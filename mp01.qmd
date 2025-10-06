@@ -57,8 +57,6 @@ COUNTRY_TOP_10 <- COUNTRY_TOP_10 |>
   mutate(season_title = if_else(season_title == "N/A", NA_character_, season_title))
 ```
 
-::: {.my-5}
-
 Netflix has become a global stage for stories that connects audiences across cultures. With its investment in original films and series, the platform continues to deliver content that is both high-quality and broadly popular. As a Data Analyst supporting Netflix’s Public Relations team, this project focuses on analyzing Netflix’s Top 10 data to uncover key insights behind the platform’s most successful titles.
 
 ::: {.callout-note icon=false style="padding: 16px 20px;"}
@@ -509,8 +507,7 @@ tv_season_debut_weeks <- COUNTRY_TOP_10 |>
   filter(category == "TV") |>
   group_by(show_title, season_title) |>
   summarise(debut_week = min(week, na.rm = TRUE), .groups = "drop") |>
-  filter(is.finite(debut_week)) # Remove any shows with no valid w
-eeks
+  filter(is.finite(debut_week)) 
 
 # Countries in debut week for each show/season
 tv_season_debut_countries <- COUNTRY_TOP_10 |>
@@ -932,5 +929,3 @@ From heartfelt storytelling to striking visuals, Korean creators have found the 
 ---
 
 # Thanks for Reading!
-
-:::
