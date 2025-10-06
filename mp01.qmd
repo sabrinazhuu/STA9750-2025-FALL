@@ -66,13 +66,13 @@ Netflix has become a global stage for stories that connects audiences across cul
 \
 **Data Source:** [Netflix’s TuDum Top 10 dataset](https://www.netflix.com/tudum/top10)
 
-**Data Period:** 2020 – Septembver 2025
+**Data Period:** 2020 – September 2025
 
 **Project Structure**
 
-- **Part 1:** Data Preparation — importing, cleaning, and organizing Netflix Top 10 data.
-- **Part 2:** Exploratory Questions — investigating key trends and insights from the Top 10 data.
-- **Part 3:** Press Releases — spotlighting Netflix’s biggest hits and milestones.
+- **Part 1:** Data Preparation — Importing, cleaning, and organizing Netflix Top 10 data.
+- **Part 2:** Exploratory Questions — Investigating key trends and insights from the Top 10 data.
+- **Part 3:** Press Releases — Spotlighting Netflix’s biggest hits and milestones.
 :::
 
 # Data Preparation {style="color:#3255A;"}
@@ -170,12 +170,17 @@ With the data ready, now it's time to explore key questions to understand Netfli
 Netflix currently operates in **{{< contents countries_operated >}}**, with **{{< contents top_country >}}** leading in content, featuring **{{< contents top_country_titles >}}**.
 
 ```{r}
-# Calculate total countries
+# Most recent week
+most_recent_week <- COUNTRY_TOP_10 |>
+  summarise(max_week = max(week, na.rm = TRUE)) |>
+  pull(max_week)
+
+# Countries Netflix currently operates in
 countries_operated <- COUNTRY_TOP_10 |>
+  filter(week == most_recent_week) |>
   summarise(num_countries = n_distinct(country_name)) |>
   pull(num_countries)
 
-# Get comprehensive data for all countries
 all_countries_data <- COUNTRY_TOP_10 |>
   group_by(country_name) |>
   summarise(
@@ -186,7 +191,7 @@ all_countries_data <- COUNTRY_TOP_10 |>
   ) |>
   arrange(desc(unique_titles))
 
-# Extract top country info
+# Top country info
 top_country <- all_countries_data |>
   slice(1) |>
   pull(country_name)
@@ -195,7 +200,7 @@ top_country_titles <- all_countries_data |>
   slice(1) |>
   pull(unique_titles)
 
-# Display with datatable - only selected columns
+# Table
 all_countries_data |>
   select(country_name, unique_titles, unique_films, unique_tv) |>
   datatable(
@@ -231,6 +236,7 @@ non_eng_top_film_weeks <- top_film |> pull(cumulative_weeks_in_top_10)
 **Weeks in Top 10:** `r non_eng_top_film_weeks`
 
 A German war film that follows Paul Bäumer, a young soldier who faces the brutal realities of World War I. The movie became one of the most popular non-English films on Netflix and received widespread praise for its powerful story and visuals.
+
 :::
 :::
 :::
@@ -297,7 +303,6 @@ top_films_non_eng <- top_viewership_data |>
 **"`r top_tv_non_eng`"** leads all categories in global viewership, showing the strong global appeal of non-English TV content. **"`r top_tv_eng`"** follows as the top English-language series, continuing its success as one of Netflix’s biggest hits. In the film categories, **"`r top_films_eng`"** and **"`r top_films_non_eng`"** stand out as the most-watched titles.
 
 ```{r}
-# Table
 kable(
   top_viewership_data |>
     select(category, show_title, hours_millions),
@@ -450,7 +455,7 @@ An action-comedy film that follows an FBI agent and two rival criminals as they 
 #### Question 9: How many Films reached Number 1 in the US but did not originally debut there? 
 
 ```{r}
-# Find all films that debuted below #1 but hit #1
+# Films that debuted below #1 but hit #1
 us_climbers <- COUNTRY_TOP_10 |>
   filter(country_name == "United States", category == "Films") |>
   group_by(show_title) |>
@@ -466,10 +471,9 @@ us_climbers <- COUNTRY_TOP_10 |>
   ) |>
   filter(hit_number1, debuted_rank > 1)
 
-# Count how many films did this
 num_climbers <- nrow(us_climbers)
 
-# Get the most recent film
+# Most recent film
 most_recent_climber <- us_climbers |>
   slice_max(most_recent_week, n = 1, with_ties = FALSE)
 
@@ -501,25 +505,25 @@ A action-packed where a world-famous K-pop group battles deadly demons. The movi
 #### Question 10: Which TV show/season hit the top 10 in the most countries in its debut week? In how many countries did it chart?
 
 ```{r}
-tv_debut_weeks <- COUNTRY_TOP_10 |>
-  filter(category == "TV") |> # Try just "TV" if that's what your data has
-  group_by(show_title) |>
+tv_season_debut_weeks <- COUNTRY_TOP_10 |>
+  filter(category == "TV") |>
+  group_by(show_title, season_title) |>
   summarise(debut_week = min(week, na.rm = TRUE), .groups = "drop") |>
   filter(is.finite(debut_week)) # Remove any shows with no valid weeks
 
-# Count countries in debut week for each show
-tv_debut_countries <- COUNTRY_TOP_10 |>
+# Countries in debut week for each show/season
+tv_season_debut_countries <- COUNTRY_TOP_10 |>
   filter(category == "TV") |>
-  inner_join(tv_debut_weeks, by = "show_title") |>
+  inner_join(tv_season_debut_weeks, by = c("show_title", "season_title")) |>
   filter(week == debut_week) |>
-  group_by(show_title) |>
+  group_by(show_title, season_title) |>
   summarise(num_countries = n_distinct(country_name), .groups = "drop") |>
   arrange(desc(num_countries)) |>
   slice_head(n = 1)
 
-# Extract values for inline use
-top_debut_show <- tv_debut_countries |> pull(show_title)
-top_debut_countries <- tv_debut_countries |> pull(num_countries)
+top_debut_show <- tv_season_debut_countries |> pull(show_title)
+top_debut_season <- tv_season_debut_countries |> pull(season_title)
+top_debut_countries <- tv_season_debut_countries |> pull(num_countries)
 ```
 
 ::: {style="border:2px solid #e0e0e0; border-radius:10px; padding:20px 20px 0 20px; background-color:#f9f9f9"}
@@ -529,7 +533,7 @@ top_debut_countries <- tv_debut_countries |> pull(num_countries)
 :::
 
 ::: {.column width="70%"}
-### `r top_debut_show`
+### `r top_debut_season`
 
 **Countries in Top 10 (First Week):** `r top_debut_countries`
 
@@ -541,7 +545,7 @@ A romantic comedy series that follows Emily, an ambitious marketing professional
 
 \
 
-# Press Releases {style="color:#3255A;"}
+# Press Releases
 
 ## Stranger Things Returns for Its Epic Finale
 
@@ -557,8 +561,10 @@ st_countries <- COUNTRY_TOP_10 |>
 # Total weeks in Top 10 globally
 st_weeks <- GLOBAL_TOP_10 |>
   filter(show_title == "Stranger Things") |>
-  summarise(max_weeks = max(cumulative_weeks_in_top_10, na.rm = TRUE)) |>
-  pull(max_weeks)
+  group_by(season_title) |>
+  summarise(max_weeks = max(cumulative_weeks_in_top_10, na.rm = TRUE), .groups = "drop") |>
+  summarise(total_weeks = sum(max_weeks, na.rm = TRUE)) |>
+  pull(total_weeks)
 
 # Total viewership
 st_views <- GLOBAL_TOP_10 |>
@@ -567,7 +573,7 @@ st_views <- GLOBAL_TOP_10 |>
   mutate(hours_millions = round(total_hours / 1e6, 1)) |>
   pull(hours_millions)
 
-# Get top 5 English TV shows for comparison
+# Top 5 English TV shows
 top_english_tv <- GLOBAL_TOP_10 |>
   filter(category == "TV (English)") |>
   group_by(show_title) |>
@@ -576,11 +582,10 @@ top_english_tv <- GLOBAL_TOP_10 |>
   arrange(desc(hours_millions)) |>
   slice_head(n = 5)
 
-# Top 2 shows that aren't Stranger Things)
+# Top 2 shows that aren't Stranger Things
 other_top_shows <- top_english_tv |>
   filter(show_title != "Stranger Things") |>
   slice_head(n = 2)
-
 top_show_1 <- other_top_shows |>
   slice(1) |>
   pull(show_title)
@@ -589,9 +594,9 @@ top_show_2 <- other_top_shows |>
   pull(show_title)
 ```
 
-For nearly a decade, Stranger Things has defined a generation of streaming. With four unforgettable seasons behind it, the iconic series will return for one last chapter at the end of 2025.
+For nearly a decade, "Stranger Things" has defined a generation of streaming. With four unforgettable seasons behind it, the iconic series will return for one last chapter at the end of 2025.
 
-Across its run, Stranger Things has reached audiences in **`r st_countries` countries**, spending over **`r st_weeks` weeks**  in the Global Top 10. Together, the four seasons have reached **`r st_views` million hours**, cementing its place among Netflix’s most-watched series. Compared to other English-language hits like **"`r top_show_1`"** and **"`r top_show_2 `"**, Stranger Things remains a standout favorite among viewers worldwide.
+Across its run, **"Stranger Things"** has reached audiences in **`r st_countries` countries**, spending over **`r st_weeks` weeks** in the Global Top 10. Together, the four seasons have reached **`r st_views` million hours**, cementing its place among Netflix’s most-watched series. Compared to other English-language hits, **"Stranger Things"** not only leads in total hours viewed but also demonstrates the power of long-running franchises to maintain global engagement, while newer hits like **"`r top_show_1`"**  bring a fresh concept and style to familiar characters. This highlights that both established series and innovative shows play key roles in driving Netflix’s English-language viewership.
 
 ```{r}
 #| fig-width: 8
@@ -623,7 +628,7 @@ ggplot(top_english_tv, aes(x = reorder(show_title, hours_millions), y = hours_mi
   )
 ```
 
-The chart below shows how Stranger Things has steadily grown with each new season, but Season 4 stands out as a major turning point. It recorded a dramatic spike in total viewing hours and climbed higher in the Global Top 10 than any previous season, showing just how much the series’ fanbase expanded over time.
+The chart below shows how "Stranger Things" has steadily grown with each new season, but Season 4 stands out as a major turning point. It recorded a dramatic spike in total viewing hours and climbed higher in the Global Top 10 than any previous season, showing just how much the series’ fanbase expanded over time.
 
 ```{r}
 stranger_things_data <- GLOBAL_TOP_10 |>
@@ -646,14 +651,14 @@ kable(stranger_things_data,
 ```
 \
 
-This surge reflects the show’s ability to reinvent itself and capture new audiences while keeping longtime fans engaged. Season 4’s success not only cemented Stranger Things as a cultural icon but also set the stage for an even more anticipated final chapter in 2025.
+This surge reflects the show’s ability to reinvent itself and capture new audiences while keeping longtime fans engaged. Season 4’s success not only cemented "Stranger Things" as a cultural icon but also set the stage for an even more anticipated final chapter in 2025.
 
 \
 
 ## Local Productions Lead Netflix’s Success in India
 
 ```{r}
-# Extract the latest week in data
+# Latest week in data
 latest_week <- COUNTRY_TOP_10 |>
   filter(country_name == "India") |>
   summarise(latest = max(week)) |>
@@ -675,10 +680,9 @@ india_shows <- COUNTRY_TOP_10 |>
 
 India, the world’s most populous country, has quickly become one of Netflix’s most dynamic markets. Since the launch of Netflix in India, audiences have embraced a wide range of local and global stories. As of **`r latest_week_formatted`**, a total of **`r india_films` films** and **`r india_shows` TV shows** have appeared in India’s Top 10 charts, highlighting the country’s growing influence on global streaming trends.
 
-When it comes to films, Indian audiences continue to show strong loyalty to homegrown hits, with the country’s Top 10 largely dominated by Hindi-language titles, with "Red Notice" being the only exception, as shown in the chart below:
+When it comes to films, Indian audiences continue to show strong loyalty to homegrown hits, with the country’s Top 10 largely dominated by Hindi-language titles as shown in the chart below:
 
 ```{r}
-# Prepare your data as before
 india_top10_films <- COUNTRY_TOP_10 |>
   filter(country_name == "India", category == "Films") |>
   group_by(show_title) |>
@@ -686,20 +690,37 @@ india_top10_films <- COUNTRY_TOP_10 |>
   arrange(desc(total_weeks)) |>
   slice_head(n = 10)
 
-# Display as an interactive datatable with conditional formatting
+highlight_titles <- c(
+  "RRR (Hindi)",
+  "Haseen Dillruba",
+  "Sooryavanshi",
+  "Animal",
+  "Lucky Baskhar",
+  "Laapataa Ladies",
+  "Bhool Bhulaiyaa 2",
+  "Mimi"
+)
+
+highlight_rows <- which(india_top10_films$show_title %in% highlight_titles) - 1
+
+# Table
 datatable(
   india_top10_films,
   colnames = c("Show Title", "Total Weeks in Top 10"),
-  options = list(dom = "t", pageLength = 10),
+  options = list(
+    dom = "t",
+    pageLength = 10,
+    rowCallback = JS(
+      paste0("function(row, data, index) {
+        if ([", paste(highlight_rows, collapse = ","), "].includes(index)) {
+          $(row).css('background-color', '#fff2d9');
+          $(row).css('font-weight', 'bold');
+        }
+      }")
+    )
+  ),
   rownames = FALSE,
   caption = "Top 10 Films in India"
-) %>% formatStyle(
-  columns = 1:2,
-  target = "row",
-  backgroundColor = styleEqual(
-    india_top10_films$show_title,
-    ifelse(india_top10_films$show_title == "Red Notice", "white", "#fff2d9")
-  )
 )
 ```
 
@@ -723,7 +744,7 @@ us_programs <- COUNTRY_TOP_10 |>
 # In India but NOT in US
 india_only_programs <- setdiff(india_programs, us_programs)
 
-# Step 4: Get detailed info with total weeks for India-only programs
+# Total weeks for India-only programs
 india_only_top <- COUNTRY_TOP_10 |>
   filter(country_name == "India", show_title %in% india_only_programs) |>
   group_by(show_title, category) |>
@@ -734,7 +755,6 @@ india_only_top <- COUNTRY_TOP_10 |>
 india_only_count <- length(india_only_programs)
 
 # Table
-# The titles you want to highlight
 highlight_titles <- c(
   "The Great Indian Kapil Show",
   "Mismatched",
@@ -746,12 +766,11 @@ highlight_titles <- c(
   "Haseen Dillruba"
 )
 
-# Find the 0-based row indices for those titles in your table
 highlight_rows <- which(india_only_top$show_title %in% highlight_titles) - 1
 
-# Datatable with only those rows highlighted
 datatable(
   india_only_top,
+  colnames = c("Show Title", "Category", "Weeks in Top 10"),
   options = list(
     dom = "t",
     pageLength = 10,
@@ -775,7 +794,7 @@ datatable(
 ## South Korean Media is Taking Over the World
 
 ```{r}
-# Top 3 TV shows globally (includes both English and Non-English)
+# Top 3 TV shows globally
 top3_tv <- GLOBAL_TOP_10 |>
   filter(category %in% c("TV (English)", "TV (Non-English)")) |>
   group_by(show_title) |>
@@ -791,7 +810,7 @@ top_tv_1_views <- top3_tv |>
   slice(1) |>
   pull(views_millions)
 
-# Top 3 films globally (includes both English and Non-English)
+# Top 3 films globally
 top3_films <- GLOBAL_TOP_10 |>
   filter(category %in% c("Films (English)", "Films (Non-English)")) |>
   group_by(show_title) |>
@@ -858,7 +877,7 @@ Moreover, among the top global non-English TV shows on Netflix, 5 out of 10 are 
 ```{r}
 #| echo: false
 
-## Top 10 Non-English TV shows by cumulative weeks with hours
+# Top 10 Non-English TV shows
 top10_nonenglish_weeks <- GLOBAL_TOP_10 |>
   filter(category == "TV (Non-English)") |>
   group_by(show_title) |>
@@ -871,7 +890,6 @@ top10_nonenglish_weeks <- GLOBAL_TOP_10 |>
   arrange(desc(cumulative_weeks)) |>
   slice_head(n = 10)
 
-# Extract top show for inline use
 top_nonenglish_weeks_show <- top10_nonenglish_weeks |>
   slice(1) |>
   pull(show_title)
@@ -882,11 +900,10 @@ top_nonenglish_weeks_hours <- top10_nonenglish_weeks |>
   slice(1) |>
   pull(hours_millions)
 
-# Identify rows to highlight
 highlighted_shows <- c("Squid Game", "Alchemy of Souls", "Extraordinary Attorney Woo", "Hometown Cha-Cha-Cha", "Queen of Tears")
 highlight_rows <- which(top10_nonenglish_weeks$show_title %in% highlighted_shows) - 1 # DT uses 0-based indexing
 
-# Create datatable with row highlighting
+# Table
 datatable(
   top10_nonenglish_weeks |> select(show_title, cumulative_weeks, hours_millions),
   colnames = c("TV Show Title", "Cumulative Weeks in Top 10", "Total Hours Viewed (Millions)"),
