@@ -5,7 +5,7 @@ title: "Welcome :D"
 ::: {.my-5}
 ![](image/intro.png){.rounded}
 
-I’m currently pursuing a **Master's in Business Analytics** at [Baruch College](https://www.baruch.cuny.edu/). On this site, you’ll find projects completed during my graduate program. 
+I’m currently pursuing a **Master's in Business Analytics** at [Baruch College](https://www.baruch.cuny.edu/). On this site, you’ll find projects completed during my masters program. 
 \
 
 #### A little about me

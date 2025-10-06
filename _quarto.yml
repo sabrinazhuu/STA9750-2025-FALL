@@ -10,12 +10,14 @@ website:
   navbar:
     background: primary
     search: false
-    
+
 format:
   html:
     theme: zephyr
     css: style.css
     toc: true
+    toc-title: "On this page"
+    toc-location: right
     code-fold: true
     code-summary: "Show the code"
 

@@ -509,7 +509,8 @@ tv_season_debut_weeks <- COUNTRY_TOP_10 |>
   filter(category == "TV") |>
   group_by(show_title, season_title) |>
   summarise(debut_week = min(week, na.rm = TRUE), .groups = "drop") |>
-  filter(is.finite(debut_week)) # Remove any shows with no valid weeks
+  filter(is.finite(debut_week)) # Remove any shows with no valid w
+eeks
 
 # Countries in debut week for each show/season
 tv_season_debut_countries <- COUNTRY_TOP_10 |>
