@@ -19,25 +19,11 @@
 .h1 {
   font-size:2em;
 }
-   
-caption {
-  text-align: left;
-}
-
+        
 #title-block-header {
   margin-top: 4rem;
 }
 
-
-#TOC {
-  margin-top: 4rem;
-  padding-left: 2rem;
-}
-
-#toc-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: #666;
-  margin-bottom: 0.5rem;
+caption {
+  text-align: left !important;
 }
