@@ -10,6 +10,14 @@ website:
   navbar:
     background: primary
     search: false
+    right: 
+      - text: "Projects"
+        menu: 
+        - text: "Most Popular Programming on Netflix"
+          href: "./docs/mp01.html"
+        - text: "Making Backyards Affordable for All"
+          href: "./docs/mp02.html"
+        
 
 format:
   html:
