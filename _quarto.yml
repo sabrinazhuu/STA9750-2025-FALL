@@ -13,10 +13,10 @@ website:
     right: 
       - text: "Projects"
         menu: 
-        - text: "Most Popular Programming on Netflix"
-          href: "./docs/mp01.html"
+        - text: "Exploring the Most Popular Programming on Netflix"
+          href: "https://sabrinazhuu.github.io/STA9750-2025-FALL/mp01"
         - text: "Making Backyards Affordable for All"
-          href: "./docs/mp02.html"
+          href: "https://sabrinazhuu.github.io/STA9750-2025-FALL/mp02"
         
 
 format:
