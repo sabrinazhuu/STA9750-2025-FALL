@@ -13,11 +13,11 @@ website:
       - text: "Projects"
         menu:
         - text: "Exploring the Most Popular Programming on Netflix"
-          href: "./mp01/"
+          href: "./mp01.html/"
         - text: "Making Backyards Affordable for All"
-          href: "./mp02/"
+          href: "./mp02.html/"
         - text: "Visualizing and Maintaining the Green Canopy of NYC"
-          href: "./mp03/"
+          href: "./mp03.html/"
 
 format:
   html:
