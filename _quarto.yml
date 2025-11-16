@@ -4,22 +4,20 @@ project:
 
 website:
   title: "STA 9750 Submission Material"
-  description:
-    Course Projects for STA 9750 at Baruch College
-  site-url: "https://<sabrinazhuu>.github.io/STA9750-2025-FALL/"
+  description: "Course Projects for STA 9750 at Baruch College"
+  site-url: "https://sabrinazhuu.github.io/STA9750-2025-FALL/"
   navbar:
     background: primary
     search: false
     right: 
       - text: "Projects"
-        menu: 
-        - text: "Exploring the Most Popular Programming on Netflix"
-          href: "https://sabrinazhuu.github.io/STA9750-2025-FALL/mp01"
-        - text: "Making Backyards Affordable for All"
-          href: "https://sabrinazhuu.github.io/STA9750-2025-FALL/mp02"
-        - text: "Visualizing and Maintaining the Green Canopy of NYC"
-          href: "https://sabrinazhuu.github.io/STA9750-2025-FALL/mp03"
-        
+        menu:
+          - text: "Exploring the Most Popular Programming on Netflix"
+            href: "https://sabrinazhuu.github.io/STA9750-2025-FALL/mp01"
+          - text: "Making Backyards Affordable for All"
+            href: "https://sabrinazhuu.github.io/STA9750-2025-FALL/mp02"
+          - text: "Visualizing and Maintaining the Green Canopy of NYC"
+            href: "https://sabrinazhuu.github.io/STA9750-2025-FALL/mp03"
 
 format:
   html:
