@@ -1,0 +1,816 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  12pt,
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+\usepackage{xcolor}
+\usepackage[lmargin=1in,rmargin=1in,tmargin=1in,bmargin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Arial}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Netflix Announces Record-Breaking Global Success for Korean Content},
+  pdfauthor={Netflix Global Communications},
+  pdfkeywords={press release, Netflix, Korean
+content, Streaming, Global},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Netflix Announces Record-Breaking Global Success for Korean
+Content}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Korean Shows and Films Lead the Way in Worldwide Streaming
+Popularity}
+\author{Netflix Global Communications}
+\date{2025-10-03}
+\begin{document}
+\maketitle
+
+
+\section{Exploring the Most Popular Programs on
+Netflix}\label{exploring-the-most-popular-programs-on-netflix}
+
+Netflix has become a global stage for stories that entertain and connect
+audiences across cultures. Each week, the Top 10 data reveals which
+films and shows capture the world's attention. This project analyzes
+that data to uncover standout content, tracking viewership trends and
+category performance to highlight titles that are both high-quality and
+widely popular.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 1) How many different countries does Netflix operate in?}
+\NormalTok{countries\_operated }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{num\_countries =} \FunctionTok{n\_distinct}\NormalTok{(country\_name)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{pull}\NormalTok{(num\_countries)}
+
+\CommentTok{\# 6) Netflix provides over 200 weeks of service history for all but one country in our data set. }
+\CommentTok{\# Which country is this and when did Netflix cease operations in that country?}
+\NormalTok{ceased\_country }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{group\_by}\NormalTok{(country\_name) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{total\_weeks =} \FunctionTok{n\_distinct}\NormalTok{(week),}
+    \AttributeTok{last\_week =} \FunctionTok{max}\NormalTok{(week)}
+\NormalTok{  ) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{arrange}\NormalTok{(total\_weeks) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{ceased\_country\_name }\OtherTok{\textless{}{-}}\NormalTok{ ceased\_country }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(country\_name)}
+\NormalTok{ceased\_country\_date }\OtherTok{\textless{}{-}}\NormalTok{ ceased\_country }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(last\_week)}
+\end{Highlighting}
+\end{Shaded}
+
+Today, Netflix continues to captivate audiences in \textbf{94
+countries}, bringing world-class entertainment to a global audience.
+Each week, the Top 10 charts reveal the titles that resonate most, and
+recent data highlights a series of record-breaking achievements. The
+only exception is \textbf{Russia}, where operations ended in
+\textbf{February 2022}.
+
+\subsection{🎬 Record-Breaking Films}\label{record-breaking-films}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 2) Which non{-}English{-}language film has spent the most cumulative weeks in the global top 10? }
+\CommentTok{\# How many weeks did it spend?}
+\NormalTok{top\_film }\OtherTok{\textless{}{-}}\NormalTok{ GLOBAL\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(category }\SpecialCharTok{==} \StringTok{"Films (Non{-}English)"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{slice\_max}\NormalTok{(cumulative\_weeks\_in\_top\_10, }\AttributeTok{n =} \DecValTok{1}\NormalTok{, }\AttributeTok{with\_ties =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{select}\NormalTok{(show\_title, cumulative\_weeks\_in\_top\_10)}
+
+\NormalTok{non\_eng\_top\_film }\OtherTok{\textless{}{-}}\NormalTok{ top\_film }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(show\_title)}
+\NormalTok{non\_eng\_top\_film\_weeks }\OtherTok{\textless{}{-}}\NormalTok{ top\_film }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(cumulative\_weeks\_in\_top\_10)}
+
+\CommentTok{\# 3) What is the longest film to have ever appeared in the Netflix global Top 10? }
+\CommentTok{\# How long is it in minutes?}
+\NormalTok{longest\_film\_data }\OtherTok{\textless{}{-}}\NormalTok{ GLOBAL\_TOP\_10 }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(category }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"Films (English)"}\NormalTok{, }\StringTok{"Films (Non{-}English)"}\NormalTok{)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(runtime)) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{runtime\_minutes =} \FunctionTok{round}\NormalTok{(}\DecValTok{60} \SpecialCharTok{*}\NormalTok{ runtime)) }\SpecialCharTok{|\textgreater{}}     
+  \FunctionTok{slice\_max}\NormalTok{(runtime\_minutes, }\AttributeTok{n =} \DecValTok{1}\NormalTok{, }\AttributeTok{with\_ties =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{|\textgreater{}}  
+  \FunctionTok{select}\NormalTok{(show\_title, runtime\_minutes)}
+
+\NormalTok{longest\_film }\OtherTok{\textless{}{-}}\NormalTok{ longest\_film\_data }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(show\_title)}
+\NormalTok{longest\_film\_min }\OtherTok{\textless{}{-}}\NormalTok{ longest\_film\_data }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(runtime\_minutes)}
+\end{Highlighting}
+\end{Shaded}
+
+Among films, \textbf{``All Quiet on the Western Front''} has made
+history, spending \textbf{23 weeks} in the global Top 10 --- the longest
+run ever for a non-English-language movie. Epic storytelling also stood
+out with \textbf{``Pushpa 2: The Rule (Reloaded Version)''}, which, at
+\textbf{224 minutes}, became the longest film ever to appear on the Top
+10 list.
+
+\subsection{📊 Most-Watched Titles}\label{most-watched-titles}
+
+When it comes to cumulative viewership,
+\textbf{``\phantomsection\label{top_title}{Squid Game}''} stands
+unrivaled, amassing
+\textbf{\phantomsection\label{squid_game_total}{5048.3} million total
+hours} across all seasons --- the highest ever recorded on Netflix. This
+cultural phenomenon continues to define global entertainment, setting a
+benchmark for what success looks like on the platform. The table below
+highlights the champions across all four content categories, showcasing
+how both series and films captivate audiences worldwide.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 4) For each of the four categories, what program has the most total hours of global viewership?}
+\NormalTok{top\_viewership\_data }\OtherTok{\textless{}{-}}\NormalTok{ GLOBAL\_TOP\_10 }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{group\_by}\NormalTok{(category, show\_title) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{total\_hours =} \FunctionTok{sum}\NormalTok{(weekly\_hours\_viewed, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(category) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{slice\_max}\NormalTok{(total\_hours, }\AttributeTok{n =} \DecValTok{1}\NormalTok{, }\AttributeTok{with\_ties =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{hours\_millions =} \FunctionTok{round}\NormalTok{(total\_hours }\SpecialCharTok{/} \FloatTok{1e6}\NormalTok{, }\DecValTok{1}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(hours\_millions))}
+
+\NormalTok{top\_title }\OtherTok{\textless{}{-}}\NormalTok{ top\_viewership\_data }\SpecialCharTok{|\textgreater{}} \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(show\_title)}
+
+\CommentTok{\#| echo: true}
+\CommentTok{\#| label: tbl{-}top{-}viewership}
+\CommentTok{\#| tbl{-}cap: "Total Viewership by Category"}
+
+\FunctionTok{library}\NormalTok{(knitr)}
+\NormalTok{top\_viewership\_data }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{select}\NormalTok{(}\AttributeTok{Category =}\NormalTok{ category, }\AttributeTok{Title =}\NormalTok{ show\_title, }\StringTok{\textasciigrave{}}\AttributeTok{Total Hours (Millions)}\StringTok{\textasciigrave{}} \OtherTok{=}\NormalTok{ hours\_millions) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{kable}\NormalTok{(}\AttributeTok{align =} \FunctionTok{c}\NormalTok{(}\StringTok{"l"}\NormalTok{, }\StringTok{"l"}\NormalTok{, }\StringTok{"r"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}llr@{}}
+\toprule\noalign{}
+Category & Title & Total Hours (Millions) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+TV (Non-English) & Squid Game & 5048.3 \\
+TV (English) & Stranger Things & 2968.0 \\
+Films (English) & KPop Demon Hunters & 523.7 \\
+Films (Non-English) & Society of the Snow & 235.9 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 7) What is the total viewership of the TV show Squid Game? Note that there are three seasons total and we are looking for the total number of hours watched across all seasons.}
+\NormalTok{squid\_game\_total }\OtherTok{\textless{}{-}}\NormalTok{ GLOBAL\_TOP\_10 }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(show\_title }\SpecialCharTok{==} \StringTok{"Squid Game"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{total\_hours =} \FunctionTok{sum}\NormalTok{(weekly\_hours\_viewed, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{hours\_millions =} \FunctionTok{round}\NormalTok{(total\_hours }\SpecialCharTok{/} \FloatTok{1e6}\NormalTok{, }\DecValTok{1}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{pull}\NormalTok{(hours\_millions)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{🚀 Climbing the Charts}\label{climbing-the-charts}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 8) The movie Red Notice has a runtime of 1 hour and 58 minutes. }
+\CommentTok{\# Approximately how many views did it receive in 2021? }
+\CommentTok{\# Note that Netflix does not provide the weekly\_views values that far back in the past,}
+\CommentTok{\# but you can compute it yourself using the total view time and the runtime.}
+
+\NormalTok{red\_notice\_runtime }\OtherTok{\textless{}{-}} \DecValTok{1} \SpecialCharTok{+} \DecValTok{58}\SpecialCharTok{/}\DecValTok{60}
+
+\NormalTok{red\_notice\_data }\OtherTok{\textless{}{-}}\NormalTok{ GLOBAL\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(show\_title }\SpecialCharTok{==} \StringTok{"Red Notice"}\NormalTok{, }
+         \FunctionTok{year}\NormalTok{(week) }\SpecialCharTok{==} \DecValTok{2021}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{total\_hours\_viewed =} \FunctionTok{sum}\NormalTok{(weekly\_hours\_viewed, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{estimated\_views =}\NormalTok{ total\_hours\_viewed }\SpecialCharTok{/}\NormalTok{ red\_notice\_runtime,}
+    \AttributeTok{views\_millions =} \FunctionTok{round}\NormalTok{(estimated\_views }\SpecialCharTok{/} \FloatTok{1e6}\NormalTok{, }\DecValTok{1}\NormalTok{)}
+\NormalTok{  )}
+
+\NormalTok{red\_notice\_views }\OtherTok{\textless{}{-}}\NormalTok{ red\_notice\_data }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(views\_millions)}
+\end{Highlighting}
+\end{Shaded}
+
+From blockbuster films like Red Notice, which drew an estimated
+\textbf{201.7} million views in 2021, to globally resonant series like
+Squid Game, Netflix continues to deliver content that dominates
+conversations across cultures.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 9) How many Films reached Number 1 in the US but did not originally debut there? }
+\CommentTok{\# That is, find films that first appeared on the Top 10 chart at, e.g., Number 4 but then became more popular and eventually hit Number 1? }
+\CommentTok{\# What is the most recent film to pull this off?}
+
+\CommentTok{\# Find all films that debuted below \#1 but hit \#1}
+\NormalTok{us\_climbers }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(country\_name }\SpecialCharTok{==} \StringTok{"United States"}\NormalTok{, category }\SpecialCharTok{==} \StringTok{"Films"}\NormalTok{) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{group\_by}\NormalTok{(show\_title) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}
+    \AttributeTok{debuted\_rank =}\NormalTok{ weekly\_rank[}\FunctionTok{which.min}\NormalTok{(week)],      }
+    \AttributeTok{hit\_number1 =} \FunctionTok{any}\NormalTok{(weekly\_rank }\SpecialCharTok{==} \DecValTok{1}\NormalTok{)            }
+\NormalTok{  ) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{summarise}\NormalTok{(}
+    \AttributeTok{debuted\_rank =} \FunctionTok{first}\NormalTok{(debuted\_rank),       }
+    \AttributeTok{hit\_number1 =} \FunctionTok{first}\NormalTok{(hit\_number1),}
+    \AttributeTok{most\_recent\_week =} \FunctionTok{max}\NormalTok{(week),}
+    \AttributeTok{.groups =} \StringTok{"drop"}
+\NormalTok{  ) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(hit\_number1, debuted\_rank }\SpecialCharTok{\textgreater{}} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# Count how many films did this}
+\NormalTok{num\_climbers }\OtherTok{\textless{}{-}} \FunctionTok{nrow}\NormalTok{(us\_climbers)}
+
+\CommentTok{\# Get the most recent film}
+\NormalTok{most\_recent\_climber }\OtherTok{\textless{}{-}}\NormalTok{ us\_climbers }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{slice\_max}\NormalTok{(most\_recent\_week, }\AttributeTok{n =} \DecValTok{1}\NormalTok{, }\AttributeTok{with\_ties =} \ConstantTok{FALSE}\NormalTok{)}
+
+\NormalTok{recent\_climber\_title }\OtherTok{\textless{}{-}}\NormalTok{ most\_recent\_climber }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(show\_title)}
+\NormalTok{recent\_climber\_debut }\OtherTok{\textless{}{-}}\NormalTok{ most\_recent\_climber }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(debuted\_rank)}
+\end{Highlighting}
+\end{Shaded}
+
+Not every hit begins at the very top. In fact, \textbf{45 films} have
+debuted below Number 1 in the U.S. charts and climbed to the top spot.
+Most recently, \textbf{``KPop Demon Hunters'' debuted at number 6}
+before capturing the top spot.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 10) Which TV show/season hit the top 10 in the most countries in its debut week? }
+\CommentTok{\# In how many countries did it chart?}
+\NormalTok{debut\_reach }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{filter}\NormalTok{(category }\SpecialCharTok{==} \StringTok{"TV"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(show\_title) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{debut\_week =} \FunctionTok{min}\NormalTok{(week)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{ungroup}\NormalTok{() }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{group\_by}\NormalTok{(show\_title, debut\_week) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{countries =} \FunctionTok{n\_distinct}\NormalTok{(country\_name), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{slice\_max}\NormalTok{(countries, }\AttributeTok{n =} \DecValTok{1}\NormalTok{, }\AttributeTok{with\_ties =} \ConstantTok{FALSE}\NormalTok{)}
+
+\NormalTok{broadest\_reach\_show }\OtherTok{\textless{}{-}}\NormalTok{ debut\_reach }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(show\_title)}
+\NormalTok{broadest\_reach\_countries }\OtherTok{\textless{}{-}}\NormalTok{ debut\_reach }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(countries)}
+\end{Highlighting}
+\end{Shaded}
+
+Some titles, however, don't need time to build momentum. \textbf{``All
+of Us Are Dead''} instantly resonated across borders, debuting in the
+Top 10 in \textbf{94} countries during its first week. This kind of
+immediate reach shows the power of global anticipation and Netflix's
+ability to connect audiences everywhere at once
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 5) Which TV show had the longest run in a country\textquotesingle{}s Top 10? }
+\CommentTok{\# How long was this run and in what country did it occur?}
+\NormalTok{longest\_run }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{slice\_max}\NormalTok{(cumulative\_weeks\_in\_top\_10, }\AttributeTok{n =} \DecValTok{1}\NormalTok{, }\AttributeTok{with\_ties =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{|\textgreater{}} 
+  \FunctionTok{select}\NormalTok{(country\_name, show\_title, cumulative\_weeks\_in\_top\_10)}
+
+\NormalTok{longest\_run\_country }\OtherTok{\textless{}{-}}\NormalTok{ longest\_run }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(country\_name)}
+\NormalTok{longest\_run\_title }\OtherTok{\textless{}{-}}\NormalTok{ longest\_run }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(show\_title)}
+\NormalTok{longest\_run\_weeks }\OtherTok{\textless{}{-}}\NormalTok{ longest\_run }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(cumulative\_weeks\_in\_top\_10)}
+\end{Highlighting}
+\end{Shaded}
+
+Beyond fast climbs and splashy debuts, staying power tells its own
+story. \textbf{``Money Heist''} held a spot in \textbf{Pakistan's} Top
+10 for \textbf{127 weeks}, marking the longest run ever.
+
+\section{Stranger Things Returns for Its Epic Final
+Season}\label{stranger-things-returns-for-its-epic-final-season}
+
+For nearly a decade, Stranger Things has defined a generation of
+streaming. With four unforgettable seasons behind it, the cultural
+juggernaut will return for one last chapter at the end of 2025.
+
+Across its run, Stranger Things has reached audiences in more than
+\textbf{\phantomsection\label{st_total_countries}{93 countries} },
+spending over \textbf{\phantomsection\label{st_total_weeks}{19 weeks}}
+in the global Top 10. Together, the four seasons have amassed more than
+\textbf{\phantomsection\label{st_total_views}{2968 viewing hours}},
+cementing its place among Netflix's most-watched series. Compared to
+other English-language hits like
+\textbf{``\phantomsection\label{top_show_1}{Wednesday}''} and
+\textbf{``\phantomsection\label{top_show_2}{Bridgerton}''}, Stranger
+Things continues to stand apart as both a critical and cultural
+phenomenon.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Total number of countries it charted in}
+\NormalTok{st\_countries }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(show\_title }\SpecialCharTok{==} \StringTok{"Stranger Things"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{num\_countries =} \FunctionTok{n\_distinct}\NormalTok{(country\_name)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{pull}\NormalTok{(num\_countries)}
+
+\CommentTok{\# Total weeks in Top 10 globally}
+\NormalTok{st\_weeks }\OtherTok{\textless{}{-}}\NormalTok{ GLOBAL\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(show\_title }\SpecialCharTok{==} \StringTok{"Stranger Things"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{max\_weeks =} \FunctionTok{max}\NormalTok{(cumulative\_weeks\_in\_top\_10, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{pull}\NormalTok{(max\_weeks)}
+
+\CommentTok{\# Total viewership}
+\NormalTok{st\_views }\OtherTok{\textless{}{-}}\NormalTok{ GLOBAL\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(show\_title }\SpecialCharTok{==} \StringTok{"Stranger Things"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{total\_hours =} \FunctionTok{sum}\NormalTok{(weekly\_hours\_viewed, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{hours\_millions =} \FunctionTok{round}\NormalTok{(total\_hours }\SpecialCharTok{/} \FloatTok{1e6}\NormalTok{, }\DecValTok{1}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{pull}\NormalTok{(hours\_millions)}
+
+\CommentTok{\# Get top 5 English TV shows for comparison}
+\NormalTok{top\_english\_tv }\OtherTok{\textless{}{-}}\NormalTok{ GLOBAL\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(category }\SpecialCharTok{==} \StringTok{"TV (English)"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(show\_title) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{total\_hours =} \FunctionTok{sum}\NormalTok{(weekly\_hours\_viewed, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{hours\_millions =} \FunctionTok{round}\NormalTok{(total\_hours }\SpecialCharTok{/} \FloatTok{1e6}\NormalTok{, }\DecValTok{1}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(hours\_millions)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{5}\NormalTok{)}
+
+\CommentTok{\# Top 2 shows that aren\textquotesingle{}t Stranger Things)}
+\NormalTok{other\_top\_shows }\OtherTok{\textless{}{-}}\NormalTok{ top\_english\_tv }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(show\_title }\SpecialCharTok{!=} \StringTok{"Stranger Things"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{2}\NormalTok{)}
+
+\NormalTok{show\_1 }\OtherTok{\textless{}{-}}\NormalTok{ other\_top\_shows }\SpecialCharTok{|\textgreater{}} \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{) }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(show\_title)}
+\NormalTok{show\_2 }\OtherTok{\textless{}{-}}\NormalTok{ other\_top\_shows }\SpecialCharTok{|\textgreater{}} \FunctionTok{slice}\NormalTok{(}\DecValTok{2}\NormalTok{) }\SpecialCharTok{|\textgreater{}} \FunctionTok{pull}\NormalTok{(show\_title)}
+
+\CommentTok{\#Graph}
+\CommentTok{\#| echo: false}
+\CommentTok{\#| fig{-}width: 8}
+\CommentTok{\#| fig{-}height: 5}
+\CommentTok{\#| fig{-}cap: "Top 5 English{-}Language TV Shows by Total Viewership"}
+
+\FunctionTok{library}\NormalTok{(ggplot2)}
+
+\CommentTok{\# Highlight Stranger Things}
+\NormalTok{top\_english\_tv }\OtherTok{\textless{}{-}}\NormalTok{ top\_english\_tv }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{highlight =} \FunctionTok{ifelse}\NormalTok{(show\_title }\SpecialCharTok{==} \StringTok{"Stranger Things"}\NormalTok{, }\StringTok{"Stranger Things"}\NormalTok{, }\StringTok{"Other"}\NormalTok{))}
+
+\FunctionTok{ggplot}\NormalTok{(top\_english\_tv, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{reorder}\NormalTok{(show\_title, hours\_millions), }\AttributeTok{y =}\NormalTok{ hours\_millions, }\AttributeTok{fill =}\NormalTok{ highlight)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_col}\NormalTok{(}\AttributeTok{width =} \FloatTok{0.5}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{label =}\NormalTok{ hours\_millions), }\AttributeTok{hjust =} \SpecialCharTok{{-}}\FloatTok{0.2}\NormalTok{, }\AttributeTok{size =} \FloatTok{3.2}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{coord\_flip}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"Stranger Things"} \OtherTok{=} \StringTok{"\#E50914"}\NormalTok{, }\StringTok{"Other"} \OtherTok{=} \StringTok{"\#564d4d"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{expand =} \FunctionTok{expansion}\NormalTok{(}\AttributeTok{mult =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{0.1}\NormalTok{))) }\SpecialCharTok{+} 
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{title =} \StringTok{"Top 5 English{-}Language TV Shows"}\NormalTok{,}
+    \AttributeTok{x =} \ConstantTok{NULL}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Total Hours Viewed (Millions)"}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}
+    \AttributeTok{legend.position =} \StringTok{"none"}\NormalTok{,}
+    \AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{face =} \StringTok{"bold"}\NormalTok{, }\AttributeTok{size =} \DecValTok{14}\NormalTok{),}
+    \AttributeTok{axis.text =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{size =} \DecValTok{12}\NormalTok{)}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{mp01_files/figure-pdf/unnamed-chunk-8-1.pdf}}
+
+As Hawkins faces its final showdown, fans around the world are preparing
+to return to the Upside Down one last time. Stranger Things Season 5
+arrives at the end of 2025, promising an epic conclusion to the series
+that changed television forever.
+
+\section{Netflix Sees Record Growth in India, Driven by Hindi-Language
+Hit}\label{netflix-sees-record-growth-in-india-driven-by-hindi-language-hit}
+
+India, the world's most populous country, has quickly become one of
+Netflix's most dynamic markets. Recent surges in Hindi-language
+viewership signal not only the platform's growing cultural relevance,
+but also its expanding subscriber base in the region.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Extract the latest week in data}
+\NormalTok{latest\_week }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(country\_name }\SpecialCharTok{==} \StringTok{"India"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{latest =} \FunctionTok{max}\NormalTok{(week)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{pull}\NormalTok{(latest)}
+
+\CommentTok{\# Unique counts for films and series}
+\NormalTok{india\_films }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(country\_name }\SpecialCharTok{==} \StringTok{"India"}\NormalTok{, category }\SpecialCharTok{==} \StringTok{"Films"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{distinct}\NormalTok{(show\_title) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{nrow}\NormalTok{()}
+
+\NormalTok{india\_series }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(country\_name }\SpecialCharTok{==} \StringTok{"India"}\NormalTok{, category }\SpecialCharTok{!=} \StringTok{"Films"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{distinct}\NormalTok{(show\_title) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{nrow}\NormalTok{()}
+
+\CommentTok{\# Top 10 films in India}
+\NormalTok{india\_top10\_films }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(country\_name }\SpecialCharTok{==} \StringTok{"India"}\NormalTok{, category }\SpecialCharTok{==} \StringTok{"Films"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(show\_title) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{total\_weeks =} \FunctionTok{sum}\NormalTok{(cumulative\_weeks\_in\_top\_10, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(total\_weeks)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+
+\CommentTok{\# Top 10 series in India (assuming non{-}films are series)}
+\NormalTok{india\_top10\_series }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(country\_name }\SpecialCharTok{==} \StringTok{"India"}\NormalTok{, category }\SpecialCharTok{!=} \StringTok{"Films"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(show\_title) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{total\_weeks =} \FunctionTok{sum}\NormalTok{(cumulative\_weeks\_in\_top\_10, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(total\_weeks)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{10}\NormalTok{)}
+
+\CommentTok{\# Table for films}
+\FunctionTok{kable}\NormalTok{(india\_top10\_films, }\AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"Show Title"}\NormalTok{, }\StringTok{"Total Weeks in Top 10"}\NormalTok{), }\AttributeTok{align =} \StringTok{"l"}\NormalTok{, }\AttributeTok{caption =} \StringTok{"Top 10 Films in India"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Top 10 Films in India}\tabularnewline
+\toprule\noalign{}
+Show Title & Total Weeks in Top 10 \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Show Title & Total Weeks in Top 10 \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+RRR (Hindi) & 325 \\
+Haseen Dillruba & 231 \\
+Sooryavanshi & 210 \\
+Animal & 153 \\
+Lucky Baskhar & 153 \\
+Laapataa Ladies & 120 \\
+Red Notice & 120 \\
+Bhool Bhulaiyaa 2 & 105 \\
+Mimi & 105 \\
+Maharaja & 78 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Table for series}
+\FunctionTok{kable}\NormalTok{(india\_top10\_series, }\AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"Show Title"}\NormalTok{, }\StringTok{"Total Weeks in Top 10"}\NormalTok{), }\AttributeTok{align =} \StringTok{"l"}\NormalTok{, }\AttributeTok{caption =} \StringTok{"Top 10 Series in India"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.6944}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.3056}}@{}}
+\caption{Top 10 Series in India}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Show Title
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Total Weeks in Top 10
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Show Title
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Total Weeks in Top 10
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Money Heist & 1543 \\
+Squid Game & 1153 \\
+Wednesday & 651 \\
+The Railway Men - The Untold Story Of Bhopal 1984 & 465 \\
+Khakee: The Bihar Chapter & 435 \\
+All of Us Are Dead & 406 \\
+Stranger Things & 357 \\
+Maamla Legal Hai & 351 \\
+The Great Indian Kapil Show & 332 \\
+Manifest & 224 \\
+\end{longtable}
+
+\section{South Korean Media is Taking Over the
+World}\label{south-korean-media-is-taking-over-the-world}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Unique films charted in Korea}
+\NormalTok{korea\_films }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(country\_name }\SpecialCharTok{==} \StringTok{"South Korea"}\NormalTok{, category }\SpecialCharTok{==} \StringTok{"Films"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{distinct}\NormalTok{(show\_title)}
+
+\NormalTok{num\_korea\_films }\OtherTok{\textless{}{-}} \FunctionTok{nrow}\NormalTok{(korea\_films)}
+
+\CommentTok{\# Unique TV series charted in Korea}
+\NormalTok{korea\_tv }\OtherTok{\textless{}{-}}\NormalTok{ COUNTRY\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(country\_name }\SpecialCharTok{==} \StringTok{"South Korea"}\NormalTok{, category }\SpecialCharTok{==} \StringTok{"TV"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{distinct}\NormalTok{(show\_title)}
+
+\NormalTok{num\_korea\_tv }\OtherTok{\textless{}{-}} \FunctionTok{nrow}\NormalTok{(korea\_tv)}
+
+
+\CommentTok{\# Top 3 films globally (includes both English and Non{-}English)}
+\NormalTok{top5\_films }\OtherTok{\textless{}{-}}\NormalTok{ GLOBAL\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(category }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"Films (English)"}\NormalTok{, }\StringTok{"Films (Non{-}English)"}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(show\_title) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{total\_views =} \FunctionTok{sum}\NormalTok{(weekly\_views, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{views\_millions =} \FunctionTok{round}\NormalTok{(total\_views }\SpecialCharTok{/} \FloatTok{1e6}\NormalTok{, }\DecValTok{1}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(views\_millions)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{3}\NormalTok{)}
+
+\CommentTok{\# Top 3 TV shows globally (includes both English and Non{-}English)}
+\NormalTok{top5\_tv }\OtherTok{\textless{}{-}}\NormalTok{ GLOBAL\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(category }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"TV (English)"}\NormalTok{, }\StringTok{"TV (Non{-}English)"}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(show\_title) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{total\_views =} \FunctionTok{sum}\NormalTok{(weekly\_views, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{views\_millions =} \FunctionTok{round}\NormalTok{(total\_views }\SpecialCharTok{/} \FloatTok{1e6}\NormalTok{, }\DecValTok{1}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(views\_millions)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{3}\NormalTok{)}
+
+\CommentTok{\# Table for films}
+\FunctionTok{kable}\NormalTok{(top5\_films }\SpecialCharTok{|\textgreater{}} \FunctionTok{select}\NormalTok{(show\_title, views\_millions),}
+      \AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"Film Title"}\NormalTok{, }\StringTok{"Total Views (Millions)"}\NormalTok{),}
+      \AttributeTok{align =} \StringTok{"l"}\NormalTok{,}
+      \AttributeTok{caption =} \StringTok{"Top 3 Most Watched Films Globally"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Top 3 Most Watched Films Globally}\tabularnewline
+\toprule\noalign{}
+Film Title & Total Views (Millions) \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Film Title & Total Views (Millions) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+KPop Demon Hunters & 314.1 \\
+Carry-On & 165.0 \\
+Back in Action & 133.6 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Table for TV shows}
+\FunctionTok{kable}\NormalTok{(top5\_tv }\SpecialCharTok{|\textgreater{}} \FunctionTok{select}\NormalTok{(show\_title, views\_millions),}
+      \AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"TV Show Title"}\NormalTok{, }\StringTok{"Total Views (Millions)"}\NormalTok{),}
+      \AttributeTok{align =} \StringTok{"l"}\NormalTok{,}
+      \AttributeTok{caption =} \StringTok{"Top 3 Most Watched TV Shows Globally"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Top 3 Most Watched TV Shows Globally}\tabularnewline
+\toprule\noalign{}
+TV Show Title & Total Views (Millions) \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+TV Show Title & Total Views (Millions) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Squid Game & 396.9 \\
+Bridgerton & 201.4 \\
+Wednesday & 176.7 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{top10\_nonenglish\_tv\_hours }\OtherTok{\textless{}{-}}\NormalTok{ GLOBAL\_TOP\_10 }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{filter}\NormalTok{(category }\SpecialCharTok{==} \StringTok{"TV (Non{-}English)"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{group\_by}\NormalTok{(show\_title) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{total\_hours =} \FunctionTok{sum}\NormalTok{(weekly\_views, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{.groups =} \StringTok{"drop"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(total\_hours)) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{slice\_head}\NormalTok{(}\AttributeTok{n =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{hours\_millions =} \FunctionTok{round}\NormalTok{(total\_hours }\SpecialCharTok{/} \FloatTok{1e6}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+
+\FunctionTok{kable}\NormalTok{(top10\_nonenglish\_tv\_hours }\SpecialCharTok{|\textgreater{}} \FunctionTok{select}\NormalTok{(show\_title, hours\_millions),}
+      \AttributeTok{col.names =} \FunctionTok{c}\NormalTok{(}\StringTok{"TV Show Title"}\NormalTok{, }\StringTok{"Total Hours Viewed (Millions)"}\NormalTok{),}
+      \AttributeTok{align =} \StringTok{"l"}\NormalTok{,}
+      \AttributeTok{caption =} \StringTok{"Top 10 Most Viewed Non{-}English TV Shows (by Hours Globally)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Top 10 Most Viewed Non-English TV Shows (by Hours
+Globally)}\tabularnewline
+\toprule\noalign{}
+TV Show Title & Total Hours Viewed (Millions) \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+TV Show Title & Total Hours Viewed (Millions) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Squid Game & 396.9 \\
+Lupin & 71.8 \\
+La Palma & 66.1 \\
+DAN DA DAN & 60.8 \\
+Berlin & 53.1 \\
+Dear Child & 49.4 \\
+Queen of Tears & 43.0 \\
+SAKAMOTO DAYS & 40.4 \\
+King the Land & 37.3 \\
+When Life Gives You Tangerines & 36.5 \\
+\end{longtable}
+
+
+
+
+\end{document}

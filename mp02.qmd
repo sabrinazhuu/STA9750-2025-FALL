@@ -19,11 +19,11 @@ format:
 
 **Project Structure**
 
-- **Data Preparation** — Importing and cleaning Census and employment data.
-- **Initial Explorations** — Investigating key trends and insights across 380+ metro areas.
-- **Housing Affordability** — Measuring affordability through Rent Burden and Housing Growth.
-- **Visualization** — Mapping trends and comparing metro areas.
-- **Policy Brief** — Proposing Federal YIMBY Housing Incentive Act.
+- Data Preparation — Importing and cleaning Census and employment data.
+- Initial Explorations — Investigating key trends and insights across 380+ metro areas.
+- Housing Affordability — Measuring affordability through Rent Burden and Housing Growth.
+- Visualization — Mapping trends and comparing metro areas.
+- xPolicy Brief — Proposing Federal YIMBY Housing Incentive Act.
 :::
 
 \
