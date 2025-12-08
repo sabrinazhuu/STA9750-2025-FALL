@@ -11,9 +11,8 @@ format:
 ---
 
 ::: {.callout-note icon="false" style="padding: 16px 20px;"}
-\
 ## Project Overview
-
+\
 **Data Period:** 1979 - 2025
 
 **Data Sources:**

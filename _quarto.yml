@@ -12,13 +12,13 @@ website:
     right: 
       - text: "Projects"
         menu:
-        - text: "MP01 - Exploring the Most Popular Programming on Netflix"
+        - text: "01 - Exploring the Most Popular Programming on Netflix"
           href: "./mp01.html"
-        - text: "MP02 - Making Backyards Affordable for All"
+        - text: "02 - Making Backyards Affordable for All"
           href: "./mp02.html"
-        - text: "MP03 - Visualizing and Maintaining the Green Canopy of NYC"
+        - text: "03 - Visualizing and Maintaining the Green Canopy of NYC"
           href: "./mp03.html"
-        - text: "MP04 - Just the Fact(-Check)s, Ma'am!"
+        - text: "04 - Just the Fact(-Check)s, Ma'am!"
           href: "./mp04.html"
 
 format:
