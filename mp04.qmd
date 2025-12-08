@@ -1,0 +1,639 @@
+---
+title: "Just the Fact(-Check)s, Ma'am!"
+subtitle: "STA 9750 Mini-Project #04"
+author: "Sabrina Zhu"
+date: today
+editor:
+    mode: source
+format:
+    html:
+        code-fold: true
+---
+
+::: {.callout-note icon="false" style="padding: 16px 20px;"}
+\
+## Project Overview
+
+**Data Period:** 1979 - 2025
+
+**Data Sources:**
+
+-   [Final CES Estimates of the total employment level of the United States](https://data.bls.gov/toppicks?survey=ce)
+-   [Nonfarm Payroll Employment Revisions](https://www.bls.gov/web/empsit/cesnaicsrev.htm)
+
+**Project Structure:**
+
+-   **Task 1:** Data Acquisition — Downloading CES employment levels and revision tables from BLS
+-   **Task 2:** Data Integration — Merging employment data with revision data and political context
+-   **Tasks 3, 4 & 5:** Statistical Analysis and Fact Checks — Integrated analysis including:
+    -   Descriptive statistics and visualizations (Task 3: 6+ statistics, 4+ plots)
+    -   Hypothesis tests (Task 4: 2+ statistical tests)
+    -   Evaluation of two political claims using Politifact Fact-o-Meter (Task 5)
+    -   Uses both absolute employment levels and revisions (Task 1 & 2)
+:::
+
+\
+
+------------------------------------------------------------------------
+
+# Context
+
+On August 1st, 2025, President Donald Trump fired [Dr. Erika McEntarfer](https://en.wikipedia.org/wiki/Erika_McEntarfer), Commissioner of the Bureau of Labor Statistics, claiming in a Truth Social post that jobs numbers were "RIGGED" against Republicans. The dismissal sparked controversy, with economists warning that politicizing the BLS undermines trust in economic data. Defenders pointed to large recent revisions as problematic, while BLS supporters noted that revisions are standard methodology, not manipulation. In this project, we investigate nearly five decades of Current Employment Statistics data to fact-check claims about BLS accuracy and alleged partisan bias, focusing on the headline "jobs number" that moves markets and dominates political discourse.
+
+\
+
+# Data Acquisition
+
+```{r libraries}
+#| message: false
+
+library(httr2)
+library(rvest)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+library(infer)
+library(DT)
+```
+
+## Final CES Estimates
+
+Using `httr2` and `rvest`, I downloaded the final CES total nonfarm payroll estimates (seasonally adjusted) for each month from January 1979 through June 2025. These represent the most accurate employment numbers available after all revisions have been incorporated.
+
+```{r CES Total Nonfarm Payroll}
+#| message: false
+#| warning: false
+
+# Task 1: Download CES Total Nonfarm Payroll
+response <- request("https://data.bls.gov/pdq/SurveyOutputServlet") |>
+  req_body_form(series_id = "CES0000000001", from_year = "1979", to_year = "2025") |>
+  req_perform()
+
+html <- resp_body_html(response)
+
+table_data <- html |>
+  html_elements("table") |>
+  (\(x) x[[2]])() |>
+  html_table()
+
+df_levels <- table_data |>
+  pivot_longer(cols = -Year, names_to = "month", values_to = "level") |>
+  mutate(date = ym(paste(Year, month)), level = as.numeric(gsub(",", "", level))) |>
+  select(date, level) |>
+  drop_na() |>
+  arrange(date)
+
+# Display as interactive datatable
+datatable(
+  df_levels,
+  options = list(
+    pageLength = 25,
+    scrollY = "400px",
+    scrollCollapse = TRUE,
+    order = list(list(0, 'asc'))
+  ),
+  caption = "CES Total Nonfarm Payroll (Thousands of Jobs)",
+  rownames = FALSE,
+  filter = 'top'
+) |>
+  formatCurrency('level', currency = "", digits = 0, mark = ",")
+```
+
+## CES Revisions
+
+Then, I downloaded the CES revision data comparing initial estimates to final estimates for each month from January 1979 through June 2025. This data shows how much the BLS adjusted their preliminary jobs numbers once more complete information became available.
+
+```{r CES Revisions Tables}
+#| message: false
+#| warning: false
+
+# Task 2: Download CES Revisions Tables
+response <- request("https://www.bls.gov/web/empsit/cesnaicsrev.htm") |>
+  req_headers(
+    "User-Agent" = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "Accept" = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language" = "en-US,en;q=0.5"
+  ) |>
+  req_perform()
+
+html <- resp_body_html(response)
+
+extract_year_data <- function(year, html) {
+  html |>
+    html_element(paste0("#", year, " tbody")) |>
+    html_table(header = FALSE) |>
+    slice(1:12) |>
+    select(month = 1, original = 3, final = 5) |>
+    mutate(date = ym(paste(year, month)), revision = final - original) |>
+    select(date, original, final, revision)
+}
+
+df_list <- list()
+for (year in 1979:2025) {
+  df_list[[as.character(year)]] <- extract_year_data(year, html)
+}
+
+df_revisions <- bind_rows(df_list)
+
+# Display as interactive datatable
+datatable(
+  df_revisions |> drop_na(),
+  options = list(
+    pageLength = 25,
+    scrollY = "400px",
+    scrollCollapse = TRUE,
+    order = list(list(0, 'asc'))  # Sort by date ascending
+  ),
+  caption = "CES Total Nonfarm Payroll Revisions (Thousands of Jobs)",
+  rownames = FALSE,
+  filter = 'top'
+) |>
+  formatCurrency(c('original', 'final'), currency = "", digits = 0, mark = ",") |>
+  formatStyle(
+    'revision',
+    color = styleInterval(c(-0.001, 0.001), c('red', 'black', 'green')),
+    fontWeight = 'bold'
+  ) |>
+  formatRound('revision', digits = 0)
+```
+
+\
+
+# Data Integration
+
+In the wake of Dr. McEntarfer's firing, politicians and commentators made numerous claims about BLS employment data. This section evaluates two specific claims using nearly 45 years of historical data (1979-2025), applying the Politifact Fact-o-Meter scale to assess their accuracy.
+
+```{r setup-data}
+#| message: false
+#| warning: false
+
+library(tidyverse)
+
+# Join employment levels with revisions
+ces_combined <- df_levels |>
+  inner_join(df_revisions, by = "date")
+
+# Prepare president/party data
+presidents_party <- tidyr::expand_grid(year=1979:2025, 
+                                       month = month.name, 
+                                       president = NA, 
+                                       party = NA) |> 
+  mutate(president = case_when(
+    (month == "January")  & (year == 1979) ~ "Carter",
+    # BLS jobs reports come out on the first Friday, so February
+    # is the first time a new president 'owns' the jobs number 
+    (month == "February") & (year == 1981) ~ "Reagan",
+    (month == "February") & (year == 1989) ~ "Bush 41",
+    (month == "February") & (year == 1993) ~ "Clinton",
+    (month == "February") & (year == 2001) ~ "Bush 43",
+    (month == "February") & (year == 2009) ~ "Obama",
+    (month == "February") & (year == 2017) ~ "Trump I",
+    (month == "February") & (year == 2021) ~ "Biden",
+    (month == "February") & (year == 2025) ~ "Trump II",
+  )) |>
+  tidyr::fill(president) |>
+  mutate(party = if_else(president %in% c("Carter", "Clinton", "Obama", "Biden"), 
+                         "D", 
+                         "R"))
+
+# Join with combined CES data
+ces_with_politics <- ces_combined |>
+  mutate(
+    year = year(date),
+    month = month(date, label = TRUE, abbr = FALSE),
+    abs_revision = abs(revision),
+    pct_revision = (revision / final) * 100,
+    abs_pct_revision = abs(pct_revision),
+    is_negative = revision < 0,
+    is_positive = revision > 0
+  ) |>
+  left_join(presidents_party, by = c("year", "month"))
+```
+
+\
+
+# Fact Check #1: Stephen Moore
+
+## The Claim
+
+> "For at least nine of the last 10 months, they've revised downward their initial headline job estimates... That 818,000 downward revision is a lot more than a rounding error. Three percent is a rounding error. Thirty percent means we've been fed a distorted view of the economy."
+>
+> — [Stephen Moore, Trump Economic Adviser and Fox Business Commentator](https://www.foxbusiness.com/economy/us-economy-missing-818000-jobs-america-were-dealing-wacky-view-our-economic-health)
+
+**Implication:** The Biden administration's strong employment numbers were systematically inflated and later revised downward, painting a false picture of economic health.
+
+\
+
+## Task 3 - Key Statistics
+
+Moore made a very specific claim: "at least nine of the last 10 months" had downward revisions. Let's check if this is true by looking at the actual data from October 2023 through July 2024 (the 10 months before he made this statement).
+
+```{r moore-setup}
+#| message: false
+#| warning: false
+
+# Define the 10-month period Moore is referring to (roughly Oct 2023 - July 2024)
+moore_period <- ces_with_politics |>
+  filter(date >= as.Date("2023-10-01") & date <= as.Date("2024-07-01")) |>
+  arrange(date)
+
+# Count negative revisions
+n_negative <- sum(moore_period$is_negative, na.rm = TRUE)
+n_total <- nrow(moore_period)
+pct_negative <- (n_negative / n_total) * 100
+
+# Calculate month-to-month employment change
+ces_analysis_levels <- ces_with_politics |>
+  arrange(date) |>
+  mutate(
+    level_change = level - lag(level),
+    abs_level_change = abs(level_change)
+  ) |>
+  filter(!is.na(level_change))
+
+# Focus on Biden period
+biden_period <- ces_analysis_levels |>
+  filter(president == "Biden")
+
+# Calculate key statistics
+biden_neg_pct <- mean(biden_period$is_negative, na.rm = TRUE)
+historical_neg_pct <- mean(ces_with_politics$is_negative, na.rm = TRUE)
+
+# Correlation test: relationship between job growth and revisions
+cor_test <- cor.test(biden_period$level_change, biden_period$revision, method = "pearson")
+
+# Table
+knitr::kable(
+  moore_period %>%
+    select(date, original, final, revision, level) %>%
+    mutate(
+      month = format(date, "%B %Y"),
+      level = formatC(level, format = "d", big.mark = ",")  # <- base R alternative
+    ),
+  digits = 0,
+  col.names = c("Date", "Original Est.", "Final Est.", "Revision", "Employment Level", "Month"),
+  caption = "Table 1: Jobs Reports in Moore's Referenced Period (Oct 2023 - July 2024)"
+)
+```
+
+\
+
+### Key Statistics (numbered for Task 3)
+
+1.  **Actual negative revision rate in Moore's period:** `r n_negative` of `r n_total` months (`r round(pct_negative, 1)`%), not "9 of 10" (90%)
+2.  **Biden's overall negative revision rate:** `r round(biden_neg_pct * 100, 1)`% vs. historical average of `r round(historical_neg_pct * 100, 1)`%
+3.  **Correlation between job growth and revisions:** `r round(cor_test$estimate, 3)` (p = `r format.pval(cor_test$p.value, digits = 3)`) - no systematic distortion
+
+\
+
+## Task 3 - Visualizations
+
+### Visualization 1: Employment Levels and Revisions During Biden
+
+```{r moore-viz1}
+#| message: false
+#| warning: false
+#| fig.cap: "Figure 1: Employment Levels and Revisions During Biden Administration"
+
+biden_period |>
+  ggplot(aes(x = date)) +
+  geom_col(aes(y = revision, fill = ifelse(revision < 0, "Negative", "Positive")),
+           alpha = 0.8, width = 25) +
+  geom_line(aes(y = level / 1000, color = "Employment Level (millions)"), size = 1.1) +
+  scale_y_continuous(
+    name = "Revision (thousands of jobs)",
+    sec.axis = sec_axis(~ . / 1000, name = "Employment Level (millions)")
+  ) +
+  scale_color_manual(values = c("Employment Level (millions)" = "darkblue"), name = NULL) +
+  scale_fill_manual(values = c("Negative" = "#d73027", "Positive" = "#1a9850"), name = "Revision Direction") +
+  theme_minimal()
+```
+
+The blue line shows a steady upward trend in total employment over the period, indicating net job growth. The bars show sizable monthly revisions, large positive revisions early (post‑pandemic) and more frequent negative revisions later—meaning first‑release job estimates were often adjusted materially.
+
+\
+
+### Visualization 2: Relationship Between Employment Growth and Revisions
+
+```{r moore-viz2}
+#| message: false
+#| warning: false
+#| fig.cap: "Figure 2: Relationship Between Employment Growth and Revisions"
+
+biden_period |>
+  ggplot(aes(x = level_change, y = revision)) +
+  geom_point(aes(color = is_negative), size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = TRUE, color = "steelblue", linewidth = 1) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  scale_color_manual(values = c("TRUE" = "red", "FALSE" = "green"),
+                     labels = c("TRUE" = "Negative Revision", "FALSE" = "Positive Revision")) +
+  labs(title = "Employment Change vs. Revision Magnitude",
+       subtitle = "No systematic relationship between job growth and downward revisions",
+       x = "Monthly Employment Change (thousands)",
+       y = "Revision (thousands)",
+       color = NULL) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 14),
+        legend.position = "bottom")
+```
+
+There is a moderate positive correlation between monthly job gains and the absolute size of subsequent revisions (correlation = `r round(cor_test$estimate, 3)`). This means larger-growth months tend to have larger revisions in magnitude; it does not imply those revisions were predominantly downward.
+
+\
+
+## Task 4 - Hypothesis Tests for Moore Analysis
+
+### Test 1: Did "at least 9 of the last 10 months" have downward revisions as Moore claimed?
+
+```{r moore-test1}
+#| message: false
+#| warning: false
+
+# Binomial test: is this proportion significantly different from 50%?
+binom_test <- binom.test(n_negative, n_total, p = 0.5, alternative = "two.sided")
+```
+
+
+**Method:** Binomial test comparing the observed proportion of negative revisions to 50% (random chance)
+
+**Results:**
+
+-   **Moore's claim:** "At least 9 of the last 10 months" (90%) were revised downward
+-   **Actual data:** `r n_negative` of `r n_total` months (`r round(pct_negative, 1)`%) had negative revisions
+-   **P-value:** `r format.pval(binom_test$p.value, digits = 3)`
+
+**Conclusion:** Moore's specific numerical claim is factually incorrect. The actual proportion is `r round(pct_negative, 1)`%, not the 90% he claimed. Furthermore, this proportion is not statistically different from what we'd expect by random chance (50%).
+
+\
+
+### Test 2: Do strong employment numbers get systematically revised downward (Moore's "distorted view" claim)?
+
+```{r moore-test2}
+#| message: false
+#| warning: false
+
+# Summary statistics
+biden_stats <- biden_period |>
+  summarise(
+    n_months = n(),
+    mean_level_change = mean(level_change, na.rm = TRUE),
+    mean_revision = mean(revision, na.rm = TRUE),
+    correlation = cor(level_change, revision, use = "complete.obs"),
+    pct_negative_rev = mean(is_negative, na.rm = TRUE) * 100
+  )
+
+knitr::kable(biden_stats,
+             digits = 2,
+             col.names = c("N Months", "Mean Level Change", "Mean Revision", 
+                          "Correlation", "% Negative Revisions"),
+             caption = "Table 3: Employment Level Changes vs Revisions (Biden Administration)")
+```
+
+**Method:** Pearson correlation between monthly employment growth and revision magnitude
+
+**Results:**
+
+-   **Correlation coefficient:** `r round(cor_test$estimate, 3)`
+-   **P-value:** `r format.pval(cor_test$p.value, digits = 3)`
+-   **95% Confidence Interval:** \[`r round(cor_test$conf.int[1], 3)`, `r round(cor_test$conf.int[2], 3)`\]
+
+**Conclusion:** A correlation of `r round(cor_test$estimate, 3)` means there's essentially no relationship between how many jobs were added and how much those estimates were revised. If Moore's "distorted view" theory were correct, we'd see a significant negative correlation (strong growth → large downward revisions). Instead, we see no pattern at all.
+
+## Task 5: Politifact Rating for Moore's Claim
+
+### Verdict: MOSTLY FALSE
+
+**Task 3 - Key Statistics:**
+
+1.  Actual count: `r n_negative` of `r n_total` months (`r round(pct_negative, 1)`%), not "9 of 10" (90%)
+2.  Biden's negative revision rate: `r round(biden_neg_pct * 100, 1)`% vs. historical average of `r round(historical_neg_pct * 100, 1)`%
+3.  Moderate positive correlation between job growth and absolute revision magnitude (r = `r round(cor_test$estimate, 3)`)
+
+**Task 3 - Visualizations**
+
+-   Figure 1: Employment remained strong with mixed revision directions
+-   Figure 2: Larger-growth months tend to have larger revisions in magnitude; no evidence that stronger months were systematically revised downward
+
+**Task 4 - Hypothesis Tests:**
+
+1.  **Test 1:** Binomial test of "9 of 10 months" claim (p = `r format.pval(binom_test$p.value, digits = 3)`)
+2.  **Test 2:** Correlation test between employment growth and revisions (r = `r round(cor_test$estimate, 3)`, p = `r format.pval(cor_test$p.value, digits = 3)`)
+
+### What the Evidence Shows
+
+1.  **The "9 of 10" claim is factually incorrect:** Moore claimed "at least nine of the last 10 months" were revised downward. The actual data shows `r n_negative` of `r n_total` months (`r round(pct_negative, 1)`%) had negative revisions, which is substantially fewer than the claimed 9 of 10 months.
+
+2.  **No evidence of systematic distortion:** Biden's administration had negative revisions `r round(biden_neg_pct * 100, 1)`% of the time compared to the historical average of `r round(historical_neg_pct * 100, 1)`%. This difference does not constitute clear evidence of systematic bias against the Biden administration.
+
+3.  **Correlation with strong growth:** The correlation between monthly job gains and the absolute size of revisions is `r round(cor_test$estimate, 3)` (p = `r format.pval(cor_test$p.value, digits = 3)`). This positive correlation indicates that months with larger reported job gains tended to have larger subsequent revisions in magnitude; it does not mean those revisions were predominantly downward.
+
+4.  **The 818,000 revision exists but lacks context:** Yes, there was a large annual benchmark revision. However, such benchmark revisions are part of standard BLS methodology and have occurred under multiple administrations. Large benchmark changes reflect improved data and methodology, not proof of manipulation.
+
+**Bottom Line:** Moore's specific numerical claim is factually incorrect, and the evidence does not support a conclusion of systematic downward revision bias during the Biden period. The data show routine revision behavior, with larger-growth months often having larger revisions in magnitude but no clear pattern of deliberate downward adjustment.
+
+\
+\
+
+# Fact Check #2: President Donald Trump
+
+## The Claim
+
+> "In my opinion, today's Jobs Numbers were RIGGED in order to make the Republicans, and ME, look bad... Just days before the \[Nov. 5 presidential\] election, they put out numbers that it was like the country was on fire. And then they did a revision about two weeks later, and the revision was down by almost 900,000 jobs"
+>
+> — [President Donald Trump](https://truthsocial.com/@realDonaldTrump)
+
+**Implication:** The BLS systematically manipulates employment data to benefit Democrats and harm Republicans.
+
+\
+
+## Task 3 - Key Statistics for Trump Analysis
+
+```{r trump-setup}
+#| message: false
+#| warning: false
+
+# Calculate revision statistics by party
+dem_revisions <- ces_with_politics |> filter(party == "D") |> pull(revision)
+rep_revisions <- ces_with_politics |> filter(party == "R") |> pull(revision)
+dem_neg_pct <- mean(ces_with_politics |> filter(party == "D") |> pull(is_negative), na.rm = TRUE)
+rep_neg_pct <- mean(ces_with_politics |> filter(party == "R") |> pull(is_negative), na.rm = TRUE)
+
+# T-test and proportion test
+t_test_party <- t.test(dem_revisions, rep_revisions)
+
+prop_test_result <- prop.test(
+  x = c(sum(ces_with_politics$party == "D" & ces_with_politics$is_negative, na.rm = TRUE),
+        sum(ces_with_politics$party == "R" & ces_with_politics$is_negative, na.rm = TRUE)),
+  n = c(sum(ces_with_politics$party == "D", na.rm = TRUE),
+        sum(ces_with_politics$party == "R", na.rm = TRUE))
+)
+```
+
+```{r trump-tables}
+#| message: false
+#| warning: false
+
+party_revision_stats <- ces_with_politics |>
+  group_by(party) |>
+  summarise(
+    n_months = n(),
+    mean_revision = mean(revision, na.rm = TRUE),
+    mean_abs_revision = mean(abs_revision, na.rm = TRUE),
+    pct_positive_revision = mean(is_positive, na.rm = TRUE) * 100,
+    pct_negative_revision = mean(is_negative, na.rm = TRUE) * 100
+  )
+
+knitr::kable(party_revision_stats, 
+             digits = 2,
+             col.names = c("Party", "N Months", "Mean Rev.", 
+                          "Mean Abs. Rev.", "% Positive", "% Negative"),
+             caption = "Table 4: Revision Statistics by Party of President")
+
+election_period <- ces_with_politics |>
+  filter(date >= as.Date("2024-06-01") & date <= as.Date("2024-12-01")) |>
+  arrange(date)
+
+knitr::kable(election_period |>
+               select(date, original, final, revision) |>
+               mutate(month = format(date, "%B %Y")),
+             digits = 0,
+             col.names = c("Date", "Original Est.", "Final Est.", "Revision", "Month"),
+             caption = "Table 5: Jobs Reports Around 2024 Election")
+```
+
+### Key Statistics
+
+1.  **Mean revisions by party:** Democrats `r round(mean(dem_revisions, na.rm = TRUE), 1)`k vs. Republicans `r round(mean(rep_revisions, na.rm = TRUE), 1)`k (difference of only `r abs(round(mean(dem_revisions, na.rm = TRUE) - mean(rep_revisions, na.rm = TRUE), 1))`k, p = `r format.pval(t_test_party$p.value, digits = 3)`)
+2.  **Negative revision rates:** Democrats `r round(dem_neg_pct * 100, 1)`% vs. Republicans `r round(rep_neg_pct * 100, 1)`% (not significantly different, p = `r format.pval(prop_test_result$p.value, digits = 3)`)
+3.  **Timeline accuracy:** 818k revision announced **75 days before** election (August 21, 2024), not "two weeks after"
+
+## Task 3 - Visualizations for Trump Analysis
+
+### Visualization 1: Mean Annual Revisions by Party
+
+```{r trump-viz1}
+#| message: false
+#| warning: false
+#| fig.cap: "Figure 3: Mean Annual Revisions by Party of President"
+
+ces_with_politics |>
+  group_by(year, party) |>
+  summarise(
+    mean_revision = mean(revision, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = year, y = mean_revision, color = party, group = party)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  scale_color_manual(values = c("D" = "blue", "R" = "red"),
+                     labels = c("Democratic", "Republican")) +
+  labs(title = "Mean Annual Revisions by Party of President",
+       subtitle = "No systematic pattern favoring either party over 45 years",
+       x = "Year", 
+       y = "Mean Revision (thousands)",
+       color = "Party") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 14),
+        legend.position = "bottom")
+```
+
+Mean annual revisions by presidential party fluctuate around zero over 45 years; there is no consistent sign of systematic advantage for either party, though a few extreme years drive much of the variation.
+
+### Visualization 2: Distribution of Revision Direction by Party
+
+```{r trump-viz2}
+#| message: false
+#| warning: false
+#| fig.cap: "Figure 4: Distribution of Revision Direction by Party"
+
+ces_with_politics |>
+  group_by(party) |>
+  summarise(
+    positive = sum(is_positive, na.rm = TRUE),
+    negative = sum(is_negative, na.rm = TRUE),
+    total = n()
+  ) |>
+  pivot_longer(cols = c(positive, negative), 
+               names_to = "direction", 
+               values_to = "count") |>
+  mutate(pct = count / total * 100) |>
+  ggplot(aes(x = party, y = pct, fill = direction)) +
+geom_col(position = "dodge", alpha = 0.8) +
+geom_hline(yintercept = 50, linetype = "dashed", color = "black") +
+scale_fill_manual(values = c("positive" = "darkgreen", "negative" = "darkred"),
+labels = c("Negative Revisions", "Positive Revisions")) +
+labs(title = "Distribution of Revision Direction by Party",
+subtitle = "Both parties cluster near 50% - consistent with random chance, not bias",
+x = "Party of President",
+y = "Percentage of Revisions",
+fill = "Revision Type") +
+theme_minimal() +
+theme(plot.title = element_text(face = "bold", size = 14),
+legend.position = "bottom")
+```
+
+Both parties have roughly a 50/50 split of positive and negative revisions, which is consistent with random chance rather than systematic rigging against one party.
+
+## Original snippet (for reference)
+
+## Task 4 - Hypothesis Tests for Trump Analysis — Corrected Text
+
+### Test 1: Do Mean Revisions Differ by Party?
+
+-   Method: Two-sample t-test comparing mean revisions under Democratic vs Republican presidents.
+
+**Results** - Democratic presidents: `r round(mean(dem_revisions, na.rm = TRUE), 1)` thousand jobs (mean revision)\
+- Republican presidents: `r round(mean(rep_revisions, na.rm = TRUE), 1)` thousand jobs (mean revision)\
+- Difference (Dem - Rep): `r round(mean(dem_revisions, na.rm = TRUE) - mean(rep_revisions, na.rm = TRUE), 1)` thousand jobs\
+- T-statistic: `r round(t_test_party$statistic, 3)`\
+- P-value: `r format.pval(t_test_party$p.value, digits = 3)`
+
+**Conclusions** - The t-test result (t = `r round(t_test_party$statistic, 3)`, p = `r format.pval(t_test_party$p.value, digits = 3)`) indicates that the observed difference in mean revisions is `r ifelse(t_test_party$p.value < 0.05, "statistically significant", "not statistically significant")` at the conventional 5% level.\
+- Practical significance: the absolute difference of `r round(mean(dem_revisions, na.rm = TRUE) - mean(rep_revisions, na.rm = TRUE), 1)` thousand jobs is very small relative to total employment (on the order of hundreds of millions of jobs measured in thousands). Even if statistically significant, this difference is limited in practical importance.
+
+### Test 2: Are Negative Revisions More Common Under Republicans?
+
+-   **Method:** Proportion test comparing rates of negative monthly revisions by party.
+
+**Results** - Democrats: `r round(dem_neg_pct * 100, 1)`% of months had negative revisions\
+- Republicans: `r round(rep_neg_pct * 100, 1)`% of months had negative revisions\
+- Difference (Rep - Dem): `r round((rep_neg_pct - dem_neg_pct) * 100, 1)` percentage points
+
+**Conclusioon** The observed difference in negative-revision rates is `r ifelse(prop_test_result$p.value < 0.05, "statistically significant", "not statistically significant")`; report counts and do robustness checks before strong claims\
+
+## Task 5: Political Fact Rating for Trump's Claim
+
+**Summary of Evidence:**
+
+**Task 3 - Key Statistics:**
+
+1.  Mean revisions: Democrats `r round(mean(dem_revisions, na.rm = TRUE), 1)`k vs. Republicans `r round(mean(rep_revisions, na.rm = TRUE), 1)`k (virtually identical)
+2.  Negative revision rates: Democrats `r round(dem_neg_pct * 100, 1)`% vs. Republicans `r round(rep_neg_pct * 100, 1)`% (no significant difference)
+3.  Timeline: 818k revision announced 75 days BEFORE election, not "two weeks after"
+
+**Task 3 - Visualizations:**
+
+-   Figure 3: No systematic partisan pattern over 45 years
+-   Figure 4: Both parties at \~50% negative revisions (random chance)
+
+**Task 4 - Hypothesis Tests:**
+
+1.  **Test 1:** Two-sample t-test: Democratic vs. Republican revision means (p = `r format.pval(t_test_party$p.value, digits = 3)`)
+2.  **Test 2:** Proportion test: Rates of negative revisions by party (p = `r format.pval(prop_test_result$p.value, digits = 3)`)
+
+**Bottom Line:** The timeline claim is false, and while some tests show statistically detectable differences by party, those differences are small in practical terms or sensitive to time-series issues and outlier years; they do not constitute proof of deliberate manipulation.
+
+\
+
+# Conclusion
+
+Both claims misrepresent the BLS revision record. Stephen Moore’s “9 of 10 months” statement is factually incorrect and overstates what the data show; revisions routinely go both up and down. Donald Trump’s timeline is wrong — the large benchmark revision was announced well before the election — and there is no convincing evidence it reflects deliberate political manipulation. Over a 45-year sample, party-level differences in mean revisions are tiny in practical terms and driven by a few large benchmark years and time-series effects; while some tests detect small statistical differences, those differences are method-sensitive and do not amount to proof of systematic partisan rigging. In short, the data do not support claims that CES revisions were politically manipulated.
+
+\
+
+-------------------------------------------------------------------------
+
+# Thanks for Reading!

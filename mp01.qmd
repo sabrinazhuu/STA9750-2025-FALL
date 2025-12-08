@@ -1,0 +1,889 @@
+---
+title: "Exploring the Most Popular Programming on Netflix"
+subtitle: "STA 9750 Mini-Project #01"
+author: "Sabrina Zhu"
+date: "`r Sys.Date()`"
+editor:
+    mode: source
+format:
+    html:
+        code-fold: true
+---
+
+::: {.callout-note icon=false style="padding: 16px 20px;"}
+## Project Overview
+\
+**Data Source:** [Netflix’s TuDum Top 10 dataset](https://www.netflix.com/tudum/top10)
+
+**Data Period:** 2020 – September 2025
+
+**Project Structure**
+
+- **Part 1:** Data Preparation — Importing, cleaning, and organizing Netflix's Top 10 data.
+- **Part 2:** Exploratory Questions — Investigating key trends and insights from the Top 10 data.
+- **Part 3:** Press Releases — Spotlighting Netflix’s biggest hits and milestones.
+:::
+
+\
+
+# Context
+
+Netflix has become a global stage for stories that connects audiences across cultures. With its investment in original films and series, the platform continues to deliver content that is both high-quality and broadly popular. As a Data Analyst supporting Netflix’s Public Relations team, this project focuses on analyzing Netflix’s Top 10 data to uncover key insights behind the platform’s most successful titles.
+
+\ 
+
+# Data Preparation
+
+## Aquiring Data
+
+This project uses two data files from Netflix’s Top 10 dataset:
+
+- **Global Top 10:** Tracks the most popular films and TV shows on Netflix across all countries.
+- **Country Top 10:** Tracks the most popular films and TV shows within each individual country.
+
+```{r}
+if (!dir.exists(file.path("data", "mp01"))) {
+  dir.create(file.path("data", "mp01"), showWarnings = FALSE, recursive = TRUE)
+}
+
+GLOBAL_TOP_10_FILENAME <- file.path("data", "mp01", "global_top10_alltime.csv")
+
+if (!file.exists(GLOBAL_TOP_10_FILENAME)) {
+  download.file("https://www.netflix.com/tudum/top10/data/all-weeks-global.tsv",
+    destfile = GLOBAL_TOP_10_FILENAME
+  )
+}
+
+COUNTRY_TOP_10_FILENAME <- file.path("data", "mp01", "country_top10_alltime.csv")
+
+if (!file.exists(COUNTRY_TOP_10_FILENAME)) {
+  download.file("https://www.netflix.com/tudum/top10/data/all-weeks-countries.tsv",
+    destfile = COUNTRY_TOP_10_FILENAME
+  )
+}
+```
+
+## Importing and Preparing Data 
+
+To begin the analysis, the Netflix data was prepared by importing the files, exploring their structure, and performing basic cleaning to ensure it was ready for insights.
+
+```{r import}
+#| message: false
+
+# Importing libraries
+if (!require("tidyverse")) install.packages("tidyverse")
+library(readr)
+library(dplyr)
+library(stringr)
+library(DT)
+library(knitr)
+library(lubridate)
+
+# Read and Clean Data
+format_titles <- function(df) {
+  colnames(df) <- str_replace_all(colnames(df), "_", " ") |> str_to_title()
+  df
+}
+
+# GLOBAL TOP 10
+GLOBAL_TOP_10 <- read_tsv(GLOBAL_TOP_10_FILENAME, show_col_types = FALSE) |>
+  mutate(season_title = if_else(season_title == "N/A", NA_character_, season_title))
+
+# COUNTRY TOP 10
+COUNTRY_TOP_10 <- read_tsv(COUNTRY_TOP_10_FILENAME, show_col_types = FALSE) |>
+  mutate(season_title = if_else(season_title == "N/A", NA_character_, season_title))
+```
+
+### Global Top 10 Dataset 
+```{r GLobal Data}
+GLOBAL_TOP_10 |>
+  mutate(`runtime_(minutes)` = round(60 * runtime)) |>
+  select(
+    -season_title,
+    -runtime
+  ) |>
+  format_titles() |>
+  head(n = 10) |>
+  datatable(options = list(searching = TRUE, info = FALSE)) |>
+  formatRound(c("Weekly Hours Viewed", "Weekly Views"))
+```
+
+### Country-Wide Top 10 Dataset 
+```{r Country Data}
+COUNTRY_TOP_10 |>
+  select(-country_iso2, -season_title) |>
+  format_titles() |>
+  head(n = 10) |>
+  datatable(options = list(searching = TRUE, info = FALSE))
+```
+
+
+# Exploratory Questions
+
+With the data ready, now it's time to explore key questions to understand Netflix’s performances.
+
+## Global Reach
+
+#### Question 1: How many different countries does Netflix operate in?
+
+Netflix currently operates in **{{< contents countries_operated >}}**, with **{{< contents top_country >}}** leading in content, featuring **{{< contents top_country_titles >}}**.
+
+```{r}
+# Most recent week
+most_recent_week <- COUNTRY_TOP_10 |>
+  summarise(max_week = max(week, na.rm = TRUE)) |>
+  pull(max_week)
+
+# Countries Netflix currently operates in
+countries_operated <- COUNTRY_TOP_10 |>
+  filter(week == most_recent_week) |>
+  summarise(num_countries = n_distinct(country_name)) |>
+  pull(num_countries)
+
+all_countries_data <- COUNTRY_TOP_10 |>
+  group_by(country_name) |>
+  summarise(
+    unique_titles = n_distinct(show_title),
+    unique_films = n_distinct(show_title[category == "Films"]),
+    unique_tv = n_distinct(show_title[category == "TV"]),
+    .groups = "drop"
+  ) |>
+  arrange(desc(unique_titles))
+
+# Top country info
+top_country <- all_countries_data |>
+  slice(1) |>
+  pull(country_name)
+
+top_country_titles <- all_countries_data |>
+  slice(1) |>
+  pull(unique_titles)
+
+# Table
+all_countries_data |>
+  select(country_name, unique_titles, unique_films, unique_tv) |>
+  datatable(
+    options = list(searching = TRUE, info = FALSE),
+    colnames = c("Country", "Unique Titles", "Films", "TV Shows")
+  )
+```
+[`{r} countries_operated` countries]{#countries_operated}
+[`{r} top_country`]{#top_country}
+[`{r} top_country_titles` titles]{#top_country_titles}
+
+## Non-English Hits
+
+#### Question 2: Which non-English-language film has spent the most cumulative weeks in the global top 10?
+```{r}
+top_film <- GLOBAL_TOP_10 |>
+  filter(category == "Films (Non-English)") |>
+  slice_max(cumulative_weeks_in_top_10, n = 1, with_ties = FALSE) |>
+  select(show_title, cumulative_weeks_in_top_10)
+
+non_eng_top_film <- top_film |> pull(show_title)
+non_eng_top_film_weeks <- top_film |> pull(cumulative_weeks_in_top_10)
+```
+::: {style="border:2px solid #e0e0e0; border-radius:10px; padding:20px 20px 0 20px; background-color:#f9f9f9"}
+::: {.columns}
+::: {.column width="30%"}
+![](https://resizing.flixster.com/Tv-nj_XzcvU5GZthFm-0xrSvvjo=/ems.cHJkLWVtcy1hc3NldHMvbW92aWVzLzljM2U3Mjk3LWExNzgtNGE2NS05OTMxLWVlZmU1NzNlZWM5MS5qcGc=){style="border-radius:8px; width:180px; height:260px; object-fit:cover;"}
+:::
+
+::: {.column width="70%"}
+### `r non_eng_top_film`
+
+**Weeks in Top 10:** `r non_eng_top_film_weeks`
+
+A German war film that follows Paul Bäumer, a young soldier who faces the brutal realities of World War I. The movie became one of the most popular non-English films on Netflix and received widespread praise for its powerful story and visuals.
+
+:::
+:::
+:::
+
+## Longest Film
+
+#### Question 3: What is the longest film to have ever appeared in the Netflix global Top 10?
+```{r}
+longest_film_data <- GLOBAL_TOP_10 |>
+  filter(category %in% c("Films (English)", "Films (Non-English)")) |>
+  filter(!is.na(runtime)) |>
+  mutate(runtime_minutes = round(60 * runtime)) |>
+  slice_max(runtime_minutes, n = 1, with_ties = FALSE) |>
+  select(show_title, runtime_minutes)
+
+longest_film <- longest_film_data |> pull(show_title)
+longest_film_min <- longest_film_data |> pull(runtime_minutes)
+```
+
+::: {style="border:2px solid #e0e0e0; border-radius:10px; padding:20px 20px 0 20px; background-color:#f9f9f9"}
+::: {.columns}
+::: {.column width="30%"}
+![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDacfqjK2xiFGpB2ZRmwSpHnH5hzvRkCqTMg&s){style="border-radius:8px; width:180px; height:260px; object-fit:cover;"}
+:::
+
+::: {.column width="70%"}
+### `r longest_film`
+
+**Duration:** `r longest_film_min` minutes
+
+An Indian action drama that continues the story of Pushpa Raj, a laborer who rises to power in the red sandalwood smuggling world. Known for its intense action scenes, strong performances, and bold storytelling, the film became the longest-running title in Netflix’s Global Top 10.
+:::
+:::
+:::
+
+
+## Global Viewership Leaders
+
+#### Question 4: For each of the four categories, what program has the most total hours of global viewership?
+
+```{r}
+top_viewership_data <- GLOBAL_TOP_10 |>
+  group_by(category, show_title) |>
+  summarise(total_hours = sum(weekly_hours_viewed, na.rm = TRUE), .groups = "drop") |>
+  group_by(category) |>
+  slice_max(total_hours, n = 1, with_ties = FALSE) |>
+  ungroup() |>
+  mutate(hours_millions = round(total_hours / 1e6, 1)) |>
+  arrange(desc(hours_millions))
+
+top_tv_non_eng <- top_viewership_data |>
+  filter(category == "TV (Non-English)") |>
+  pull(show_title)
+top_tv_eng <- top_viewership_data |>
+  filter(category == "TV (English)") |>
+  pull(show_title)
+top_films_eng <- top_viewership_data |>
+  filter(category == "Films (English)") |>
+  pull(show_title)
+top_films_non_eng <- top_viewership_data |>
+  filter(category == "Films (Non-English)") |>
+  pull(show_title)
+```
+**"`r top_tv_non_eng`"** leads all categories in global viewership, showing the strong global appeal of non-English TV content. **"`r top_tv_eng`"** follows as the top English-language series, continuing its success as one of Netflix’s biggest hits. In the film categories, **"`r top_films_eng`"** and **"`r top_films_non_eng`"** stand out as the most-watched titles.
+
+```{r}
+kable(
+  top_viewership_data |>
+    select(category, show_title, hours_millions),
+  col.names = c("Category", "Show Title", "Total Hours Viewed (Millions)"),
+  align = "l",
+  caption = "Top Global Viewerships"
+)
+```
+## Longest TV Run
+
+#### Question 5: Which TV show had the longest run in a country's Top 10?
+```{r}
+longest_run <- COUNTRY_TOP_10 |>
+  slice_max(cumulative_weeks_in_top_10, n = 1, with_ties = FALSE) |>
+  select(country_name, show_title, cumulative_weeks_in_top_10)
+
+longest_run_country <- longest_run |> pull(country_name)
+longest_run_title <- longest_run |> pull(show_title)
+longest_run_weeks <- longest_run |> pull(cumulative_weeks_in_top_10)
+```
+
+::: {style="border:2px solid #e0e0e0; border-radius:10px; padding:20px 20px 0 20px; background-color:#f9f9f9"}
+::: {.columns}
+::: {.column width="30%"}
+![](https://cdna.artstation.com/p/assets/images/images/046/103/336/large/illusion-design-money-heist-poster-min.jpg?1644314844){style="border-radius:8px; width:180px; height:260px; object-fit:cover;"}
+:::
+
+::: {.column width="70%"}
+### `r longest_run_title`
+
+**Top 10 Run:** `r longest_run_weeks` weeks | **Country:** `r longest_run_country`
+
+A Spanish crime drama following a group of robbers executing meticulously planned heists under the guidance of their mastermind, “The Professor.” The series blends intense action, clever strategies, and strong character development, keeping viewers on edge.
+
+:::
+:::
+:::
+
+## Service History
+
+#### Question 6: Which country did Netflix cease operations in?
+```{r}
+ceased_country <- COUNTRY_TOP_10 |>
+  group_by(country_name) |>
+  summarise(
+    total_weeks = n_distinct(week),
+    last_week = max(week)
+  ) |>
+  arrange(total_weeks) |>
+  slice_head(n = 1)
+
+ceased_country_name <- ceased_country |> pull(country_name)
+ceased_country_date <- ceased_country |> pull(last_week)
+```
+
+Nearly every country has over 200 weeks of Netflix service history, except **`r ceased_country_name`**, where operations ended in **`r format(ceased_country_date, "%B %Y")`**.
+
+```{r}
+ceased_country_total <- COUNTRY_TOP_10 |>
+  filter(country_name == ceased_country_name) |>
+  summarise(
+    total_weeks = n_distinct(week),
+    total_titles = n_distinct(show_title),
+    first_week = format(min(week), "%d %b %Y"),
+    last_week = format(max(week), "%d %b %Y")
+  )
+
+kable(ceased_country_total,
+  col.names = c(
+    "Total Weeks", "Unique Titles", "First Week", "Last Week"
+  ),
+  align = "l",
+  caption = "Summary Performance"
+)
+```
+
+## Squid Game Viewership
+
+#### Question 7: What is the total viewership of the TV show Squid Game?
+
+```{r}
+title_7 <- "Squid Game"
+total_view_show <- GLOBAL_TOP_10 |>
+  filter(show_title == title_7) |>
+  summarise(total_hours = sum(weekly_hours_viewed, na.rm = TRUE)) |>
+  mutate(hours_millions = round(total_hours / 1e6, 1)) |>
+  pull(hours_millions)
+```
+
+::: {style="border:2px solid #e0e0e0; border-radius:10px; padding:20px 20px 0 20px; background-color:#f9f9f9"}
+::: {.columns}
+::: {.column width="30%"}
+![](https://m.media-amazon.com/images/I/7118ecsxO3L.jpg){style="border-radius:8px; width:180px; height:260px; object-fit:cover;"}
+:::
+
+::: {.column width="70%"}
+### `r title_7`
+
+**Total viewership:** `r total_view_show` million hours
+
+A South Korean thriller that follows desperate contestants competing in deadly children’s games for a massive cash prize. The series combines suspense, social commentary, and shocking twists, keeping viewers hooked from start to finish.
+
+:::
+:::
+:::
+
+
+## Red Notice Viewership
+
+#### Question 8: Approximately how many views did Red Notice receive in 2021? 
+
+```{r}
+title_8 <- "Red Notice"
+rn_runtime <- 1 + 58 / 60
+
+rn_data <- GLOBAL_TOP_10 |>
+  filter(
+    show_title == title_8,
+    year(week) == 2021
+  ) |>
+  summarise(total_hours_viewed = sum(weekly_hours_viewed, na.rm = TRUE)) |>
+  mutate(
+    estimated_views = total_hours_viewed / rn_runtime,
+    views_millions = round(estimated_views / 1e6, 1)
+  )
+
+rn_views <- rn_data |> pull(views_millions)
+```
+
+::: {style="border:2px solid #e0e0e0; border-radius:10px; padding:20px 20px 0 20px; background-color:#f9f9f9"}
+::: {.columns}
+::: {.column width="30%"}
+![](https://m.media-amazon.com/images/M/MV5BOGNjNGQ3MmItYTM5NS00NjBiLWI0ZTItZDE5ZjQyNjg3ODBjXkEyXkFqcGc@._V1_.jpg){style="border-radius:8px; width:180px; height:260px; object-fit:cover;"}
+:::
+
+::: {.column width="70%"}
+### `r title_8`
+
+**2021 Viewership:** `r rn_views` million views
+
+An action-comedy film that follows an FBI agent and two rival criminals as they team up to catch the world’s most wanted art thief. With a runtime of 1 hour and 58 minutes, the movie combines high-stakes heists, humor, and star power, making it an entertaining global hit.
+
+:::
+:::
+:::
+
+
+## Climbing the Charts
+
+#### Question 9: How many Films reached Number 1 in the US but did not originally debut there? 
+
+```{r}
+# Films that debuted below #1 but hit #1
+us_climbers <- COUNTRY_TOP_10 |>
+  filter(country_name == "United States", category == "Films") |>
+  group_by(show_title) |>
+  mutate(
+    debuted_rank = weekly_rank[which.min(week)],
+    hit_number1 = any(weekly_rank == 1)
+  ) |>
+  summarise(
+    debuted_rank = first(debuted_rank),
+    hit_number1 = first(hit_number1),
+    most_recent_week = max(week),
+    .groups = "drop"
+  ) |>
+  filter(hit_number1, debuted_rank > 1)
+
+num_climbers <- nrow(us_climbers)
+
+# Most recent film
+most_recent_climber <- us_climbers |>
+  slice_max(most_recent_week, n = 1, with_ties = FALSE)
+
+recent_climber_title <- most_recent_climber |> pull(show_title)
+recent_climber_debut <- most_recent_climber |> pull(debuted_rank)
+```
+
+Not every hit begins at the very top. **`r num_climbers` films** started below Number 1 in the U.S. charts and later achieved Number 1 status. The most recent example is **"`r recent_climber_title`"** as audiences were drawn in by its thrilling animation and soundtrack.
+
+::: {style="border:2px solid #e0e0e0; border-radius:10px; padding:20px 20px 0 20px; background-color:#f9f9f9"}
+::: {.columns}
+::: {.column width="30%"}
+![](https://imgc.allpostersimages.com/img/posters/netflix-kpop-demon-hunters-2025-group_u-L-FAIGVS0.jpg){style="border-radius:8px; width:180px; height:260px; object-fit:cover;"}
+:::
+
+::: {.column width="70%"}
+### `r recent_climber_title`
+
+**U.S. Starting Rank:** `r recent_climber_debut`
+
+A action-packed where a world-famous K-pop group battles deadly demons. The movie combines high-energy action, colorful visuals, and music-inspired themes, appealing to both action fans and K-pop enthusiasts.
+
+:::
+:::
+:::
+
+## Global Debuts
+
+#### Question 10: Which TV show/season hit the top 10 in the most countries in its debut week? In how many countries did it chart?
+
+```{r}
+tv_season_debut_weeks <- COUNTRY_TOP_10 |>
+  filter(category == "TV") |>
+  group_by(show_title, season_title) |>
+  summarise(debut_week = min(week, na.rm = TRUE), .groups = "drop") |>
+  filter(is.finite(debut_week))
+
+# Countries in debut week for each show/season
+tv_season_debut_countries <- COUNTRY_TOP_10 |>
+  filter(category == "TV") |>
+  inner_join(tv_season_debut_weeks, by = c("show_title", "season_title")) |>
+  filter(week == debut_week) |>
+  group_by(show_title, season_title) |>
+  summarise(num_countries = n_distinct(country_name), .groups = "drop") |>
+  arrange(desc(num_countries)) |>
+  slice_head(n = 1)
+
+top_debut_show <- tv_season_debut_countries |> pull(show_title)
+top_debut_season <- tv_season_debut_countries |> pull(season_title)
+top_debut_countries <- tv_season_debut_countries |> pull(num_countries)
+```
+
+::: {style="border:2px solid #e0e0e0; border-radius:10px; padding:20px 20px 0 20px; background-color:#f9f9f9"}
+::: {.columns}
+::: {.column width="30%"}
+![](https://m.media-amazon.com/images/M/MV5BYjhlN2ZiYTYtZGE5OS00ZmQyLTlkMmMtZDEzOTUyZDkzOTMzXkEyXkFqcGc@._V1_.jpg){style="border-radius:8px; width:180px; height:260px; object-fit:cover;"}
+:::
+
+::: {.column width="70%"}
+### `r top_debut_season`
+
+**Countries in Top 10 (First Week):** `r top_debut_countries`
+
+A romantic comedy series that follows Emily, an ambitious marketing professional from the U.S., as she navigates work, friendships, and love in Paris. The show combines humor, fashion, and charming city life, making it a lighthearted and popular global hit.
+
+:::
+:::
+:::
+
+\
+
+# Press Releases
+
+## Stranger Things Returns for Its Epic Finale
+
+![](https://images.squarespace-cdn.com/content/v1/51b3dc8ee4b051b96ceb10de/8e95aca5-8f48-4678-b204-4b2af3f4c452/STARNGER+THINGS+5+Trailer+and+Poster+Teases+The+Final+Epic+Battle+and+%2522One+Last+Adventure%2522.jpg){style="border-radius:8px;"}
+
+```{r}
+# Total number of countries it charted in
+st_countries <- COUNTRY_TOP_10 |>
+  filter(show_title == "Stranger Things") |>
+  summarise(num_countries = n_distinct(country_name)) |>
+  pull(num_countries)
+
+# Total weeks in Top 10 globally
+st_weeks <- GLOBAL_TOP_10 |>
+  filter(show_title == "Stranger Things") |>
+  group_by(season_title) |>
+  summarise(max_weeks = max(cumulative_weeks_in_top_10, na.rm = TRUE), .groups = "drop") |>
+  summarise(total_weeks = sum(max_weeks, na.rm = TRUE)) |>
+  pull(total_weeks)
+
+# Total viewership
+st_views <- GLOBAL_TOP_10 |>
+  filter(show_title == "Stranger Things") |>
+  summarise(total_hours = sum(weekly_hours_viewed, na.rm = TRUE)) |>
+  mutate(hours_millions = round(total_hours / 1e6, 1)) |>
+  pull(hours_millions)
+
+# Top 5 English TV shows
+top_english_tv <- GLOBAL_TOP_10 |>
+  filter(category == "TV (English)") |>
+  group_by(show_title) |>
+  summarise(total_hours = sum(weekly_hours_viewed, na.rm = TRUE), .groups = "drop") |>
+  mutate(hours_millions = round(total_hours / 1e6, 1)) |>
+  arrange(desc(hours_millions)) |>
+  slice_head(n = 5)
+
+# Top 2 shows that aren't Stranger Things
+other_top_shows <- top_english_tv |>
+  filter(show_title != "Stranger Things") |>
+  slice_head(n = 2)
+top_show_1 <- other_top_shows |>
+  slice(1) |>
+  pull(show_title)
+top_show_2 <- other_top_shows |>
+  slice(2) |>
+  pull(show_title)
+```
+
+For nearly a decade, "Stranger Things" has defined a generation of streaming. With four unforgettable seasons behind it, the iconic series will return for one last chapter at the end of 2025.
+
+Across its run, **"Stranger Things"** has reached audiences in **`r st_countries` countries**, spending over **`r st_weeks` weeks** in the Global Top 10. Together, the four seasons have reached **`r st_views` million hours**, cementing its place among Netflix’s most-watched series. Compared to other English-language hits, **"Stranger Things"** not only leads in total hours viewed but also demonstrates the power of long-running franchises to maintain global engagement, while newer hits like **"`r top_show_1`"**  bring a fresh concept and style to familiar characters. This highlights that both established series and innovative shows play key roles in driving Netflix’s English-language viewership.
+
+```{r}
+#| fig-width: 8
+#| fig-height: 5
+
+library(ggplot2)
+
+# Highlight Stranger Things
+top_english_tv <- top_english_tv |>
+  mutate(highlight = ifelse(show_title == "Stranger Things", "Stranger Things", "Other"))
+
+ggplot(top_english_tv, aes(x = reorder(show_title, hours_millions), y = hours_millions, fill = highlight)) +
+  geom_col(width = 0.5) +
+  geom_text(aes(label = hours_millions), hjust = -0.2, size = 3.2) +
+  coord_flip() +
+  scale_fill_manual(values = c("Stranger Things" = "#E50914", "Other" = "#564d4d")) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(
+    title = "Top 5 English-Language TV Shows",
+    x = NULL,
+    y = "Total Hours Viewed (Millions)"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(face = "bold", size = 16),
+    axis.text.y = element_text(size = 12),
+    axis.title.x = element_text(margin = margin(t = 15))
+  )
+```
+
+The chart below shows how "Stranger Things" has steadily grown with each new season, but Season 4 stands out as a major turning point. It recorded a dramatic spike in total viewing hours and climbed higher in the Global Top 10 than any previous season, showing just how much the series’ fanbase expanded over time.
+
+```{r}
+stranger_things_data <- GLOBAL_TOP_10 |>
+  filter(show_title == "Stranger Things", !is.na(season_title)) |>
+  group_by(season_title) |>
+  summarise(
+    total_hours = sum(weekly_hours_viewed, na.rm = TRUE),
+    cumulative_weeks = max(cumulative_weeks_in_top_10, na.rm = FALSE),
+    .groups = "drop"
+  ) |>
+  mutate(hours_millions = round(total_hours / 1e6, 1)) |>
+  arrange(season_title) |>
+  select(season_title, hours_millions, cumulative_weeks)
+
+kable(stranger_things_data,
+  col.names = c("Season", "Total Hours (Millions)", "Weeks in Top 10"),
+  align = c("l", "r", "r"),
+  caption = "Stranger Things Seasons Data"
+)
+```
+\
+
+This surge reflects the show’s ability to reinvent itself and capture new audiences while keeping longtime fans engaged. Season 4’s success not only cemented "Stranger Things" as a cultural icon but also set the stage for an even more anticipated final chapter in 2025.
+
+\
+
+## Local Productions Lead Netflix’s Success in India
+
+```{r}
+# Latest week in data
+latest_week <- COUNTRY_TOP_10 |>
+  filter(country_name == "India") |>
+  summarise(latest = max(week)) |>
+  pull(latest)
+
+latest_week_formatted <- format(latest_week, "%B %d, %Y")
+
+# Unique counts for films and series
+india_films <- COUNTRY_TOP_10 |>
+  filter(country_name == "India", category == "Films") |>
+  distinct(show_title) |>
+  nrow()
+
+india_shows <- COUNTRY_TOP_10 |>
+  filter(country_name == "India", category != "Films") |>
+  distinct(show_title) |>
+  nrow()
+```
+
+India, the world’s most populous country, has quickly become one of Netflix’s most dynamic markets. Since the launch of Netflix in India, audiences have embraced a wide range of local and global stories. As of **`r latest_week_formatted`**, a total of **`r india_films` films** and **`r india_shows` TV shows** have appeared in India’s Top 10 charts, highlighting the country’s growing influence on global streaming trends.
+
+When it comes to films, Indian audiences continue to show strong loyalty to homegrown hits, with the country’s Top 10 largely dominated by Hindi-language titles as shown in the chart below:
+
+```{r}
+india_top10_films <- COUNTRY_TOP_10 |>
+  filter(country_name == "India", category == "Films") |>
+  group_by(show_title) |>
+  summarise(total_weeks = sum(cumulative_weeks_in_top_10, na.rm = TRUE), .groups = "drop") |>
+  arrange(desc(total_weeks)) |>
+  slice_head(n = 10)
+
+highlight_titles <- c(
+  "RRR (Hindi)",
+  "Haseen Dillruba",
+  "Sooryavanshi",
+  "Animal",
+  "Lucky Baskhar",
+  "Laapataa Ladies",
+  "Bhool Bhulaiyaa 2",
+  "Mimi"
+)
+
+# Table
+datatable(
+  india_top10_films,
+  colnames = c("Show Title", "Total Weeks in Top 10"),
+  options = list(
+    dom = "t",
+    pageLength = 10
+  ),
+  caption = "Top 10 Films in India"
+) |>
+  formatStyle(
+    "show_title",
+    target = "row",
+    backgroundColor = styleEqual(highlight_titles, rep("#fff2d9", length(highlight_titles))),
+    fontWeight = styleEqual(highlight_titles, rep("bold", length(highlight_titles)))
+  )
+```
+
+\
+
+Indian viewers have continued to support a diverse range of content, with **{{< contents india_count >}} programs** programs gaining popularity in India despite not charting in the U.S. This number represents more than half of all titles available on Netflix India, highlighting the strong preference for locally produced stories and the impact of Netflix’s investment in domestic productions. The table below showcases India-only Top 10 titles, which are primarily of Indian origin and reflect this strong local audience engagement.
+
+```{r}
+# India's Top 10
+india_programs <- COUNTRY_TOP_10 |>
+  filter(country_name == "India") |>
+  distinct(show_title) |>
+  pull(show_title)
+
+# US Top 10
+us_programs <- COUNTRY_TOP_10 |>
+  filter(country_name == "United States") |>
+  distinct(show_title) |>
+  pull(show_title)
+
+# In India but NOT in US
+india_only_programs <- setdiff(india_programs, us_programs)
+
+# Total weeks for India-only programs
+india_only_top <- COUNTRY_TOP_10 |>
+  filter(country_name == "India", show_title %in% india_only_programs) |>
+  group_by(show_title, category) |>
+  summarise(weeks_in_top10 = n(), .groups = "drop") |>
+  arrange(desc(weeks_in_top10)) |>
+  slice_head(n = 10)
+
+india_only_count <- length(india_only_programs)
+
+# Table
+highlight_titles <- c(
+  "The Great Indian Kapil Show",
+  "Mismatched",
+  "The Railway Men - The Untold Story Of Bhopal 1984",
+  "Kota Factory",
+  "Khakee: The Bihar Chapter",
+  "Maamla Legal Hai",
+  "Rana Naidu",
+  "Haseen Dillruba"
+)
+
+highlight_rows <- which(india_only_top$show_title %in% highlight_titles) - 1
+
+datatable(
+  india_only_top,
+  colnames = c("Show Title", "Category", "Weeks in Top 10"),
+  options = list(
+    dom = "t",
+    pageLength = 10
+  ),
+  caption = "India-only Top 10 Titles"
+) |>
+  formatStyle(
+    "show_title",
+    target = "row",
+    backgroundColor = styleEqual(highlight_titles, rep("#ebfaec", length(highlight_titles))),
+    fontWeight = styleEqual(highlight_titles, rep("bold", length(highlight_titles)))
+  )
+```
+[`r india_only_count`]{#india_count}
+
+\
+
+## South Korean Media is Taking Over the World
+
+```{r}
+# Top 3 TV shows globally
+top3_tv <- GLOBAL_TOP_10 |>
+  filter(category %in% c("TV (English)", "TV (Non-English)")) |>
+  group_by(show_title) |>
+  summarise(total_views = sum(weekly_views, na.rm = TRUE), .groups = "drop") |>
+  mutate(views_millions = round(total_views / 1e6, 1)) |>
+  arrange(desc(views_millions)) |>
+  slice_head(n = 3)
+
+top_tv_1 <- top3_tv |>
+  slice(1) |>
+  pull(show_title)
+top_tv_1_views <- top3_tv |>
+  slice(1) |>
+  pull(views_millions)
+
+# Top 3 films globally
+top3_films <- GLOBAL_TOP_10 |>
+  filter(category %in% c("Films (English)", "Films (Non-English)")) |>
+  group_by(show_title) |>
+  summarise(total_views = sum(weekly_views, na.rm = TRUE), .groups = "drop") |>
+  mutate(views_millions = round(total_views / 1e6, 1)) |>
+  arrange(desc(views_millions)) |>
+  slice_head(n = 3)
+
+top_film_1 <- top3_films |>
+  slice(1) |>
+  pull(show_title)
+top_film_1_views <- top3_films |>
+  slice(1) |>
+  pull(views_millions)
+```
+
+South Korean media has taken the world by storm, with its shows and films dominating Netflix charts across continents. Once seen as niche, Korean productions have now become global sensations that shape pop culture and spark worldwide fandoms.
+
+According to the data, **`r top_film_1`**  and **`r top_tv_1`** have claimed the number one spots globally for films and TV shows, respectively. 
+
+```{r}
+# Table for films
+top_film <- top3_films$show_title[1]
+
+datatable(
+  top3_films |>
+    select(Film = show_title, `Total Views (Millions)` = views_millions),
+  options = list(
+    dom = "t",
+    searching = FALSE,
+    info = FALSE
+  ),
+  caption = "Top 3 Most Watched Films Globally"
+) |>
+  formatStyle(
+    "Film",
+    target = "row",
+    backgroundColor = styleEqual(top_film, "#dbe5ff"),
+    fontWeight = styleEqual(top_film, "bold")
+  )
+
+# Table for TV shows
+top_tv_show <- top3_tv$show_title[1]
+
+datatable(
+  top3_tv |>
+    select(`TV Show` = show_title, `Total Views (Millions)` = views_millions),
+  options = list(
+    dom = "t",
+    searching = FALSE,
+    info = FALSE
+  ),
+  caption = "Top 3 Most Watched TV Shows Globally"
+) |>
+  formatStyle(
+    "TV Show",
+    target = "row",
+    backgroundColor = styleEqual(top_tv_show, "#dbe5ff"),
+    fontWeight = styleEqual(top_tv_show, "bold")
+  )
+```
+\
+
+Moreover, among the top global non-English TV shows on Netflix, 5 out of 10 are Korean dramas, highlighting the enduring popularity of K-dramas and their ability to captivate audiences worldwide with compelling storytelling and strong production values.
+
+```{r}
+#| echo: false
+
+# Top 10 Non-English TV shows
+top10_nonenglish_weeks <- GLOBAL_TOP_10 |>
+  filter(category == "TV (Non-English)") |>
+  group_by(show_title) |>
+  summarise(
+    cumulative_weeks = max(cumulative_weeks_in_top_10),
+    total_hours = sum(weekly_hours_viewed, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(hours_millions = round(total_hours / 1e6, 1)) |>
+  arrange(desc(cumulative_weeks)) |>
+  slice_head(n = 10)
+
+top_nonenglish_weeks_show <- top10_nonenglish_weeks |>
+  slice(1) |>
+  pull(show_title)
+top_nonenglish_weeks_count <- top10_nonenglish_weeks |>
+  slice(1) |>
+  pull(cumulative_weeks)
+top_nonenglish_weeks_hours <- top10_nonenglish_weeks |>
+  slice(1) |>
+  pull(hours_millions)
+
+highlighted_shows <- c(
+  "Squid Game",
+  "Alchemy of Souls",
+  "Extraordinary Attorney Woo",
+  "Hometown Cha-Cha-Cha",
+  "Queen of Tears"
+)
+
+datatable(
+  top10_nonenglish_weeks |> select(show_title, cumulative_weeks, hours_millions),
+  colnames = c("TV Show Title", "Cumulative Weeks in Top 10", "Total Hours Viewed (Millions)"),
+  caption = "Top 10 Non-English TV Shows by Cumulative Weeks in Global Top 10",
+  options = list(
+    dom = "t",
+    searching = FALSE,
+    info = FALSE
+  )
+) |>
+  formatStyle(
+    "show_title",
+    target = "row",
+    backgroundColor = styleEqual(highlighted_shows, rep("#dbe5ff", length(highlighted_shows))),
+    fontWeight = styleEqual(highlighted_shows, rep("bold", length(highlighted_shows)))
+  )
+```
+\
+
+From heartfelt storytelling to striking visuals, Korean creators have found the perfect recipe for stories that resonate everywhere. It’s clear that K-dramas aren’t just trending, they’ve become a powerful force shaping what the world loves to watch.
+
+\
+
+------------------------------------------------------------------------
+
+# Thanks for Reading!
