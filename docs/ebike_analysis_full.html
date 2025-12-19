@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.21">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Zhu">
+<meta name="dcterms.date" content="2025-12-13">
+
+<title>Citi Bike Usage in NYC – STA 9750 Submission Material</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ea1d7ac60288e0f1efdbc993fd8432ae.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-f245066ca199b7326ac6b360085ddf3a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">STA 9750 Submission Material</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-projects" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Projects</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-projects">    
+        <li>
+    <a class="dropdown-item" href="././mp01.html">
+ <span class="dropdown-text">01 - Exploring the Most Popular Programming on Netflix</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="././mp02.html">
+ <span class="dropdown-text">02 - Making Backyards Affordable for All</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="././mp03.html">
+ <span class="dropdown-text">03 - Visualizing and Maintaining the Green Canopy of NYC</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="././mp04.html">
+ <span class="dropdown-text">04 - Just the Fact(-Check)s, Ma’am!</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#research-question" id="toc-research-question" class="nav-link" data-scroll-target="#research-question">Research Question</a></li>
+  <li><a href="#data-overview" id="toc-data-overview" class="nav-link" data-scroll-target="#data-overview">Data Overview</a></li>
+  </ul></li>
+  <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology">Methodology</a>
+  <ul class="collapse">
+  <li><a href="#rider-type-distribution" id="toc-rider-type-distribution" class="nav-link" data-scroll-target="#rider-type-distribution">Rider Type Distribution</a></li>
+  <li><a href="#infrastructure-classification-methodology" id="toc-infrastructure-classification-methodology" class="nav-link" data-scroll-target="#infrastructure-classification-methodology">Infrastructure Classification Methodology</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#the-counterintuitive-finding" id="toc-the-counterintuitive-finding" class="nav-link" data-scroll-target="#the-counterintuitive-finding">The Counterintuitive Finding</a></li>
+  <li><a href="#geographic-distribution-of-bike-type-usage" id="toc-geographic-distribution-of-bike-type-usage" class="nav-link" data-scroll-target="#geographic-distribution-of-bike-type-usage">Geographic Distribution of Bike Type Usage</a></li>
+  <li><a href="#explaining-the-pattern-demand-depletes-supply" id="toc-explaining-the-pattern-demand-depletes-supply" class="nav-link" data-scroll-target="#explaining-the-pattern-demand-depletes-supply">Explaining the Pattern: Demand Depletes Supply</a></li>
+  <li><a href="#multi-dimensional-analysis" id="toc-multi-dimensional-analysis" class="nav-link" data-scroll-target="#multi-dimensional-analysis">Multi-Dimensional Analysis</a></li>
+  </ul></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a>
+  <ul class="collapse">
+  <li><a href="#implications-for-the-overarching-research-question" id="toc-implications-for-the-overarching-research-question" class="nav-link" data-scroll-target="#implications-for-the-overarching-research-question">Implications for the Overarching Research Question</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
+  <li><a href="#recommendations" id="toc-recommendations" class="nav-link" data-scroll-target="#recommendations">Recommendations</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Citi Bike Usage in NYC</h1>
+<p class="subtitle lead">STA 9750 Individual Final Report</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Zhu </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">December 13, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="callout callout-style-default callout-note no-icon callout-titled" style="padding: 16px 20px;">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Project Overview
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Overarching Question:</strong> Among weather, time, location, and other rider characteristics, which variables are the most important drivers of Citi Bike trip volume in Manhattan?</p>
+<p><strong>Specific Question:</strong> How does station infrastructure relate to e-bike vs classic bike usage?</p>
+<p><strong>Data Period:</strong> October 2024 – October 2025</p>
+<p><strong>Data Source:</strong></p>
+<ul>
+<li>Bike data from <a href="https://citibikenyc.com/system-data">Citi Bike System Data</a></li>
+<li>Bike Routes from <a href="https://catalog.data.gov/dataset/new-york-city-bike-routes">NYC Open Data</a>
+<ul>
+<li>Data Fields: Roadway type, protected lanes, shared lanes, lane width, route length</li>
+<li>Reason: We can explore how infrastructure affects bike-sharing usage</li>
+</ul></li>
+</ul>
+<p><strong>Project Structure:</strong></p>
+<ol type="1">
+<li>Introduction &amp; Research Question</li>
+<li>Methodology (Infrastructure Classification)</li>
+<li>Results (E-bike Usage Analysis)</li>
+<li>Multi-Dimensional Analysis</li>
+<li>Discussion &amp; Conclusion</li>
+</ol>
+</div>
+</div>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>The rise of electric bikes (e-bikes) has transformed urban cycling, offering riders an easier, faster, and less physically demanding alternative to traditional classic bikes. In New York City’s Citi Bike system, e-bikes have become increasingly popular, now accounting for approximately 68% of all trips in Manhattan. This shift raises important questions about how infrastructure and external factors influence rider choices between e-bikes and classic bikes.</p>
+<p>This analysis examines a specific question within a broader group project investigating whether bike-share usage responds more to infrastructure factors (such as protected bike lanes and station density) or external factors (such as weather, time of day, and rider type). While my teammates focus on ridership volume and patterns, my contribution examines what type of bike people choose to ride and whether infrastructure plays a role in that decision.</p>
+<p>Understanding the relationship between infrastructure and bike type usage has practical implications for urban planning and bike-share operations. If infrastructure quality directly influences bike type preferences, cities might prioritize different investments. Alternatively, if the relationship is more complex—driven by demand patterns rather than infrastructure itself—operators might focus on rebalancing and supply management strategies.</p>
+<section id="research-question" class="level3">
+<h3 class="anchored" data-anchor-id="research-question">Research Question</h3>
+<p><strong>Specific Question:</strong> How does station infrastructure relate to e-bike vs classic bike usage?</p>
+<p>This question connects to our group’s overarching investigation of which variables most strongly drive Citi Bike trip volume in Manhattan. While my teammates examine factors like weather, time of day, and rider demographics, my contribution focuses on whether infrastructure affects not just how much people ride, but what they choose to ride. The hypothesis was straightforward: better infrastructure should encourage e-bike usage, as riders in well-connected areas with protected lanes might feel more comfortable using faster e-bikes. However, as we will see, the data tells a more nuanced story.</p>
+</section>
+<section id="data-overview" class="level3">
+<h3 class="anchored" data-anchor-id="data-overview">Data Overview</h3>
+<p>This analysis uses a 5% stratified sample of Citi Bike trip data from Manhattan, spanning October 2024 through October 2025. The sample includes over 1.6 million trips, stratified by date to ensure representative coverage across all time periods and seasonal variations. This sampling approach maintains the temporal distribution of the original dataset while reducing computational demands for analysis.</p>
+<p>Additionally, I incorporated NYC bike route infrastructure data from the NYC Department of Transportation to classify stations by their proximity to bike lanes and the density of nearby stations. This spatial dataset includes information on bike lane locations, types (protected, conventional, shared), and connectivity across the Manhattan street network. By combining trip data with infrastructure data, we can examine whether the cycling environment around each station influences what type of bike people choose to ride.</p>
+<p>The analysis focuses specifically on the choice between electric and classic bikes, treating this as a binary outcome for each trip. While Citi Bike also offers dockless e-bikes in some areas, these represent a small fraction of the overall fleet and are excluded from this analysis to maintain consistency across the network.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create manhattan polygon if it doesn't exist</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">"data/gis/manhattan_polygon.rds"</span>)) {</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="st">"data/gis"</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  borough_url <span class="ot">&lt;-</span> <span class="st">"https://www.nyc.gov/assets/planning/download/zip/data-maps/open-data/nybb_16a.zip"</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  borough_zip <span class="ot">&lt;-</span> <span class="st">"data/gis/nyc_boroughs.zip"</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download.file</span>(borough_url, borough_zip, <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unzip</span>(borough_zip, <span class="at">exdir =</span> <span class="st">"data/gis"</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  shp_file <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">"data/gis"</span>, <span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\</span><span class="st">.shp$"</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span>]</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  boroughs <span class="ot">&lt;-</span> <span class="fu">st_read</span>(shp_file, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  boroughs <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(boroughs, <span class="dv">4326</span>)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  manhattan_poly <span class="ot">&lt;-</span> boroughs[boroughs<span class="sc">$</span>BoroName <span class="sc">==</span> <span class="st">"Manhattan"</span>, ]</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(manhattan_poly, <span class="st">"data/gis/manhattan_polygon.rds"</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>citibike_sample <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/processed/citibike_manhattan_sample_5pct.rds"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>routes <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/individual_report/bike_routes.rds"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>manhattan_poly <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/gis/manhattan_polygon.rds"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Loaded"</span>, <span class="fu">format</span>(<span class="fu">nrow</span>(citibike_sample), <span class="at">big.mark =</span> <span class="st">","</span>), <span class="st">"trips</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loaded 1,618,078 trips</code></pre>
+</div>
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Date range:"</span>, <span class="fu">as.character</span>(<span class="fu">min</span>(citibike_sample<span class="sc">$</span>date)), </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"to"</span>, <span class="fu">as.character</span>(<span class="fu">max</span>(citibike_sample<span class="sc">$</span>date)), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Date range: 2024-09-29 to 2025-10-31 </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="methodology" class="level2">
+<h2 class="anchored" data-anchor-id="methodology">Methodology</h2>
+<section id="rider-type-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="rider-type-distribution">Rider Type Distribution</h3>
+<p>Before examining infrastructure effects, it is important to understand the baseline distribution of bike type usage across different rider categories. Citi Bike distinguishes between two rider types: members (annual subscribers) and casual riders (single-ride or day-pass users). These groups may have fundamentally different riding behaviors, preferences, and sensitivities to various factors.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rider_summary <span class="ot">&lt;-</span> citibike_sample[, .(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">total_trips =</span> .N,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">electric_bikes =</span> <span class="fu">sum</span>(rideable_type <span class="sc">==</span> <span class="st">"electric_bike"</span>),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">classic_bikes =</span> <span class="fu">sum</span>(rideable_type <span class="sc">==</span> <span class="st">"classic_bike"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>), by <span class="ot">=</span> member_casual]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>rider_summary[, <span class="st">`</span><span class="at">:=</span><span class="st">`</span>(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">pct_electric =</span> <span class="fu">round</span>(electric_bikes <span class="sc">/</span> total_trips <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">pct_classic =</span> <span class="fu">round</span>(classic_bikes <span class="sc">/</span> total_trips <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>)]</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(rider_summary, </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>             <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Rider Type"</span>, <span class="st">"Total Trips"</span>, <span class="st">"Electric Bikes"</span>, </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>                          <span class="st">"Classic Bikes"</span>, <span class="st">"% Electric"</span>, <span class="st">"% Classic"</span>),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">format.args =</span> <span class="fu">list</span>(<span class="at">big.mark =</span> <span class="st">","</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 16%">
+<col style="width: 20%">
+<col style="width: 19%">
+<col style="width: 15%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Rider Type</th>
+<th style="text-align: right;">Total Trips</th>
+<th style="text-align: right;">Electric Bikes</th>
+<th style="text-align: right;">Classic Bikes</th>
+<th style="text-align: right;">% Electric</th>
+<th style="text-align: right;">% Classic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">member</td>
+<td style="text-align: right;">1,340,439</td>
+<td style="text-align: right;">896,332</td>
+<td style="text-align: right;">444,107</td>
+<td style="text-align: right;">66.9</td>
+<td style="text-align: right;">33.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">casual</td>
+<td style="text-align: right;">277,639</td>
+<td style="text-align: right;">203,233</td>
+<td style="text-align: right;">74,406</td>
+<td style="text-align: right;">73.2</td>
+<td style="text-align: right;">26.8</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The data reveals several important baseline patterns. Overall, e-bike usage averages 68% across all trips, indicating a strong general preference for electric bikes. However, this preference varies by rider type. Casual riders show a higher e-bike preference at 73.2%, compared to members at 66.9%—a gap of approximately 6 percentage points.</p>
+<p>This difference likely reflects several factors. Casual riders, who may be tourists or occasional users, might prefer the easier riding experience that e-bikes provide, especially when navigating unfamiliar routes. Members, who ride more frequently, may be more price-conscious given the additional fee for e-bike usage. Regular commuters might also prefer the predictability of classic bikes for their daily routines.</p>
+<p>Notably, members account for 78% of all trips despite having lower e-bike usage rates. This means that member behavior heavily influences overall system patterns, and any infrastructure effects on members will have outsized impacts on aggregate statistics.</p>
+</section>
+<section id="infrastructure-classification-methodology" class="level3">
+<h3 class="anchored" data-anchor-id="infrastructure-classification-methodology">Infrastructure Classification Methodology</h3>
+<p>To examine the relationship between infrastructure and bike type usage, I developed a composite infrastructure score for each Citi Bike station. This score combines two metrics that capture different aspects of cycling infrastructure quality.</p>
+<p>The first metric is <strong>station density</strong>, measured as the number of other Citi Bike stations within a 500-meter radius. Higher station density indicates better network coverage, providing riders with more options for starting and ending trips. Dense station networks reduce the walking distance to find an available bike and increase the likelihood of finding docking space at the destination.</p>
+<p>The second metric is <strong>bike lane proximity</strong>, measured as the distance from each station to the nearest bike lane. Stations closer to bike lanes offer riders immediate access to dedicated cycling infrastructure, potentially making both e-bike and classic bike rides safer and more comfortable.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get unique stations with coordinates</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>stations <span class="ot">&lt;-</span> citibike_sample[<span class="sc">!</span><span class="fu">is.na</span>(start_station_id) <span class="sc">&amp;</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                             <span class="sc">!</span><span class="fu">is.na</span>(start_lat) <span class="sc">&amp;</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                             <span class="sc">!</span><span class="fu">is.na</span>(start_lng), </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                           .(<span class="at">lat =</span> <span class="fu">first</span>(start_lat),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">lng =</span> <span class="fu">first</span>(start_lng),</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">station_name =</span> <span class="fu">first</span>(start_station_name)),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                           by <span class="ot">=</span> start_station_id]</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to spatial object</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>stations_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(stations, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"lng"</span>, <span class="st">"lat"</span>), <span class="at">crs =</span> <span class="dv">4326</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Metric 1: Station Density (count nearby stations within 500m)</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>stations_buffer <span class="ot">&lt;-</span> <span class="fu">st_buffer</span>(stations_sf, <span class="at">dist =</span> <span class="dv">500</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>stations<span class="sc">$</span>nearby_count <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(stations_sf), <span class="cf">function</span>(i) {</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(<span class="fu">st_intersects</span>(stations_buffer[i, ], stations_sf, <span class="at">sparse =</span> <span class="cn">FALSE</span>)) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Metric 2: Distance to Bike Lanes</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>manhattan_bbox <span class="ot">&lt;-</span> <span class="fu">st_bbox</span>(<span class="fu">c</span>(<span class="at">xmin =</span> <span class="sc">-</span><span class="fl">74.02</span>, <span class="at">xmax =</span> <span class="sc">-</span><span class="fl">73.90</span>, <span class="at">ymin =</span> <span class="fl">40.70</span>, <span class="at">ymax =</span> <span class="fl">40.88</span>), </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>                          <span class="at">crs =</span> <span class="fu">st_crs</span>(<span class="dv">4326</span>)) <span class="sc">|&gt;</span> <span class="fu">st_as_sfc</span>()</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>manhattan_routes_sf <span class="ot">&lt;-</span> routes <span class="sc">%&gt;%</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">st_intersects</span>(geometry, manhattan_bbox, <span class="at">sparse =</span> <span class="cn">FALSE</span>)[,<span class="dv">1</span>]) <span class="sc">%&gt;%</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="dv">4326</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>stations<span class="sc">$</span>dist_to_bike_lane_m <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(stations_sf), <span class="cf">function</span>(i) {</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  distances <span class="ot">&lt;-</span> <span class="fu">st_distance</span>(stations_sf[i, ], manhattan_routes_sf)</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">min</span>(<span class="fu">as.numeric</span>(distances))</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Create Infrastructure Score (normalized 0-1)</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>stations<span class="sc">$</span>density_score <span class="ot">&lt;-</span> (stations<span class="sc">$</span>nearby_count <span class="sc">-</span> <span class="fu">min</span>(stations<span class="sc">$</span>nearby_count)) <span class="sc">/</span> </span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">max</span>(stations<span class="sc">$</span>nearby_count) <span class="sc">-</span> <span class="fu">min</span>(stations<span class="sc">$</span>nearby_count))</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>max_dist <span class="ot">&lt;-</span> <span class="fu">quantile</span>(stations<span class="sc">$</span>dist_to_bike_lane_m, <span class="fl">0.95</span>)</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>stations<span class="sc">$</span>lane_proximity_score <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">pmin</span>(stations<span class="sc">$</span>dist_to_bike_lane_m, max_dist) <span class="sc">/</span> max_dist</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>stations<span class="sc">$</span>infrastructure_score <span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="sc">*</span> stations<span class="sc">$</span>density_score <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> stations<span class="sc">$</span>lane_proximity_score</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Classify into tertiles</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>tertiles <span class="ot">&lt;-</span> <span class="fu">quantile</span>(stations<span class="sc">$</span>infrastructure_score, <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.33</span>, <span class="fl">0.67</span>))</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>stations<span class="sc">$</span>infrastructure_level <span class="ot">&lt;-</span> <span class="fu">cut</span>(</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>  stations<span class="sc">$</span>infrastructure_score,</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">breaks =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>, tertiles[<span class="dv">1</span>], tertiles[<span class="dv">2</span>], <span class="cn">Inf</span>),</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Low"</span>, <span class="st">"Medium"</span>, <span class="st">"High"</span>),</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>  <span class="at">include.lowest =</span> <span class="cn">TRUE</span></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Save station classification</span></span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(stations, <span class="st">"data/processed/stations_infrastructure.rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Both metrics were normalized to a 0-1 scale and combined with equal weights to create the composite infrastructure score. Stations were then classified into three categories—Low, Medium, and High infrastructure—based on tertiles of this score. This classification allows for meaningful comparisons across infrastructure levels while maintaining sufficient sample sizes in each category.</p>
+<p>The resulting classification reveals a clear geographic pattern, as shown in the infrastructure map below. High-infrastructure stations (shown in green) concentrate in Lower Manhattan and Midtown, where station density is highest and bike lanes are most prevalent. Low-infrastructure stations (shown in red) appear primarily in Upper Manhattan and along the periphery of the network, where stations are more spread out and bike lane coverage is less comprehensive.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> manhattan_poly, <span class="at">fill =</span> <span class="st">"gray95"</span>, <span class="at">color =</span> <span class="st">"gray60"</span>, <span class="at">size =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> manhattan_routes_sf, <span class="at">color =</span> <span class="st">"lightblue"</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> stations, </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat, <span class="at">color =</span> infrastructure_level, <span class="at">size =</span> nearby_count),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Low"</span> <span class="ot">=</span> <span class="st">"#F44336"</span>, <span class="st">"Medium"</span> <span class="ot">=</span> <span class="st">"#FF9800"</span>, <span class="st">"High"</span> <span class="ot">=</span> <span class="st">"#4CAF50"</span>),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"Infrastructure Level"</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_continuous</span>(<span class="at">name =</span> <span class="st">"Station Density"</span>, <span class="at">range =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>)) <span class="sc">+</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Citi Bike Station Infrastructure"</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Stations classified by bike lane proximity and station density"</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Size indicates number of nearby stations within 500m"</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"right"</span>,</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">color =</span> <span class="st">"gray40"</span>)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="ebike_analysis_full_files/figure-html/map-infrastructure-1.png" class="img-fluid figure-img" width="960"></p>
+<figcaption>Station Infrastructure Classification Across Manhattan</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<section id="the-counterintuitive-finding" class="level3">
+<h3 class="anchored" data-anchor-id="the-counterintuitive-finding">The Counterintuitive Finding</h3>
+<p>The central finding of this analysis contradicts the initial hypothesis. Rather than showing higher e-bike usage in areas with better infrastructure, the data reveals an <strong>inverse relationship</strong>: high-infrastructure stations actually have lower e-bike usage rates than low-infrastructure stations.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate e-bike % by station</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>station_variation <span class="ot">&lt;-</span> citibike_sample[, .(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">ebike_pct =</span> <span class="fu">mean</span>(rideable_type <span class="sc">==</span> <span class="st">"electric_bike"</span>) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">trips =</span> .N,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">lat =</span> <span class="fu">mean</span>(start_lat),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">lng =</span> <span class="fu">mean</span>(start_lng)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>), by <span class="ot">=</span> start_station_name]</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge with infrastructure</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>station_full <span class="ot">&lt;-</span> <span class="fu">merge</span>(station_variation, </span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                      stations[, .(station_name, infrastructure_level, infrastructure_score)],</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                      <span class="at">by.x =</span> <span class="st">"start_station_name"</span>, </span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                      <span class="at">by.y =</span> <span class="st">"station_name"</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>                      <span class="at">all.x =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate bike balance (relative to average)</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>overall_ebike_share <span class="ot">&lt;-</span> <span class="fu">mean</span>(citibike_sample<span class="sc">$</span>rideable_type <span class="sc">==</span> <span class="st">"electric_bike"</span>) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>station_full[, bike_balance <span class="sc">:</span><span class="er">=</span> ebike_pct <span class="sc">-</span> overall_ebike_share]</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary by infrastructure level</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>infra_summary <span class="ot">&lt;-</span> station_full[<span class="sc">!</span><span class="fu">is.na</span>(infrastructure_level), .(</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean_ebike =</span> <span class="fu">round</span>(<span class="fu">mean</span>(ebike_pct), <span class="dv">1</span>),</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_stations =</span> .N</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>), by <span class="ot">=</span> infrastructure_level]</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(infra_summary,</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>             <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Infrastructure Level"</span>, <span class="st">"Mean E-bike Usage %"</span>, <span class="st">"Number of Stations"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Infrastructure Level</th>
+<th style="text-align: right;">Mean E-bike Usage %</th>
+<th style="text-align: right;">Number of Stations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Low</td>
+<td style="text-align: right;">71.8</td>
+<td style="text-align: right;">242</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Medium</td>
+<td style="text-align: right;">71.8</td>
+<td style="text-align: right;">250</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">High</td>
+<td style="text-align: right;">66.7</td>
+<td style="text-align: right;">242</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The table above shows that low and medium infrastructure stations average approximately 72% e-bike usage, while high-infrastructure stations average only 67%—a difference of about 5 percentage points. This pattern is statistically consistent across individual stations, as demonstrated in the scatter plot below.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(station_full[<span class="sc">!</span><span class="fu">is.na</span>(infrastructure_score) <span class="sc">&amp;</span> trips <span class="sc">&gt;=</span> <span class="dv">50</span> <span class="sc">&amp;</span> ebike_pct <span class="sc">&gt;=</span> <span class="dv">40</span>], </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> infrastructure_score, <span class="at">y =</span> ebike_pct)) <span class="sc">+</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> infrastructure_level, <span class="at">size =</span> trips), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Low"</span> <span class="ot">=</span> <span class="st">"#F44336"</span>, <span class="st">"Medium"</span> <span class="ot">=</span> <span class="st">"#FF9800"</span>, <span class="st">"High"</span> <span class="ot">=</span> <span class="st">"#4CAF50"</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">name =</span> <span class="st">"Infrastructure Level"</span>) <span class="sc">+</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">6</span>), <span class="at">name =</span> <span class="st">"Total Trips"</span>) <span class="sc">+</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Infrastructure Score vs. E-bike Usage"</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Each dot is a station | Dashed line shows overall trend"</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Infrastructure Score (higher = better infrastructure)"</span>,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"E-bike Usage (%)"</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="ebike_analysis_full_files/figure-html/scatter-plot-1.png" class="img-fluid figure-img" width="960"></p>
+<figcaption>Infrastructure Score vs E-bike Usage by Station</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The scatter plot reveals several important patterns. First, the trend line slopes clearly downward, confirming that higher infrastructure scores correlate with lower e-bike usage. Second, the color distribution reinforces this pattern—red dots (low infrastructure) cluster toward the upper left, while green dots (high infrastructure) cluster toward the lower right. Third, the largest dots, representing the busiest stations, tend to be green (high infrastructure) and show lower e-bike percentages. This last observation provides a crucial clue to understanding the underlying mechanism.</p>
+</section>
+<section id="geographic-distribution-of-bike-type-usage" class="level3">
+<h3 class="anchored" data-anchor-id="geographic-distribution-of-bike-type-usage">Geographic Distribution of Bike Type Usage</h3>
+<p>The geographic pattern of bike type usage becomes clear when mapping each station’s e-bike usage relative to the Manhattan average of 68%.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="at">data =</span> manhattan_poly, <span class="at">fill =</span> <span class="st">"gray95"</span>, <span class="at">color =</span> <span class="st">"gray60"</span>, <span class="at">linewidth =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> station_full[trips <span class="sc">&gt;=</span> <span class="dv">50</span>],</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">x =</span> lng, <span class="at">y =</span> lat, <span class="at">color =</span> bike_balance, <span class="at">size =</span> trips),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">alpha =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradientn</span>(</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"#08306b"</span>, <span class="st">"#2171b5"</span>, <span class="st">"#6baed6"</span>, <span class="st">"#f7f7f7"</span>, <span class="st">"#fcbba1"</span>, <span class="st">"#fb6a4a"</span>, <span class="st">"#cb181d"</span>),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> scales<span class="sc">::</span><span class="fu">rescale</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="dv">60</span>, <span class="sc">-</span><span class="dv">30</span>, <span class="sc">-</span><span class="dv">10</span>, <span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">25</span>, <span class="dv">40</span>)),</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">60</span>, <span class="dv">40</span>),</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">30</span>, <span class="dv">0</span>, <span class="dv">20</span>),</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"More classic"</span>, <span class="st">"Near avg"</span>, <span class="st">"More e-bikes"</span>),</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"Relative E-bike Share"</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">7</span>), <span class="at">name =</span> <span class="st">"Station</span><span class="sc">\n</span><span class="st">Trip Volume"</span>, <span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Where Are Stations More or Less E-bike-Heavy?"</span>,</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">sprintf</span>(<span class="st">"Color shows difference from Manhattan average (~%.0f%% e-bikes): orange = higher, blue = lower"</span>, overall_ebike_share),</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Data: Citi Bike Manhattan trips | Stations with 50+ trips shown"</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>(<span class="at">datum =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"right"</span>,</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">color =</span> <span class="st">"gray40"</span>)</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="ebike_analysis_full_files/figure-html/balance-map-1.png" class="img-fluid figure-img" width="960"></p>
+<figcaption>Bike Type Balance Across Manhattan Stations</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The map tells a compelling geographic story. Lower Manhattan and Midtown—the areas with the highest infrastructure scores—appear predominantly blue, indicating below-average e-bike usage. Upper Manhattan and the network periphery—areas with lower infrastructure scores—appear predominantly orange, indicating above-average e-bike usage.</p>
+<p>This pattern seems paradoxical until we consider demand. The high-infrastructure areas of Lower Manhattan and Midtown are also the highest-demand areas of the Citi Bike network. These neighborhoods serve major employment centers, transit hubs, and tourist destinations. The volume of riders competing for bikes at these stations is substantially higher than in residential Upper Manhattan.</p>
+</section>
+<section id="explaining-the-pattern-demand-depletes-supply" class="level3">
+<h3 class="anchored" data-anchor-id="explaining-the-pattern-demand-depletes-supply">Explaining the Pattern: Demand Depletes Supply</h3>
+<p>The inverse relationship between infrastructure and e-bike usage is best explained by supply and demand dynamics rather than rider preferences. E-bikes are generally preferred by riders—as evidenced by the 68% overall usage rate. However, e-bikes are a limited resource that gets depleted faster at high-demand stations.</p>
+<p>When a rider arrives at a busy Midtown station during rush hour, they may <em>want</em> an e-bike, but if all e-bikes have already been taken by earlier riders, they must settle for a classic bike. In contrast, a rider arriving at a quieter Upper Manhattan station is more likely to find e-bikes available simply because fewer riders are competing for them.</p>
+<p>This interpretation is supported by the observation that the largest stations (biggest dots in the scatter plot) tend to have the lowest e-bike percentages. Station size correlates with demand, and high demand leads to e-bike depletion.</p>
+</section>
+<section id="multi-dimensional-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="multi-dimensional-analysis">Multi-Dimensional Analysis</h3>
+<p>To further test this interpretation and examine whether the pattern holds across different conditions, I analyzed e-bike usage across three dimensions simultaneously: rider type, station traffic level, and time of day.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define time periods</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>citibike_sample[, time_period <span class="sc">:</span><span class="er">=</span> <span class="fu">fcase</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  hour <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>), <span class="st">"Morning Rush"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  hour <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">11</span>,<span class="dv">12</span>,<span class="dv">13</span>,<span class="dv">14</span>,<span class="dv">15</span>), <span class="st">"Midday"</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  hour <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">16</span>,<span class="dv">17</span>,<span class="dv">18</span>,<span class="dv">19</span>), <span class="st">"Evening Rush"</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  hour <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">20</span>,<span class="dv">21</span>,<span class="dv">22</span>,<span class="dv">23</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>), <span class="st">"Night"</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)]</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>citibike_sample[, time_period <span class="sc">:</span><span class="er">=</span> <span class="fu">factor</span>(time_period, </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Morning Rush"</span>, <span class="st">"Midday"</span>, <span class="st">"Evening Rush"</span>, <span class="st">"Night"</span>))]</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Define volume groups</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>citibike_sample[, station_volume <span class="sc">:</span><span class="er">=</span> .N, by <span class="ot">=</span> start_station_name]</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>citibike_sample[, volume_group <span class="sc">:</span><span class="er">=</span> <span class="fu">cut</span>(station_volume, </span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">breaks =</span> <span class="fu">quantile</span>(station_volume, <span class="at">probs =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.33</span>, <span class="fl">0.67</span>, <span class="dv">1</span>)),</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Low Traffic"</span>, <span class="st">"Medium Traffic"</span>, <span class="st">"High Traffic"</span>),</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">include.lowest =</span> <span class="cn">TRUE</span>)]</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate e-bike % by rider type, volume, and time</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>ebike_full <span class="ot">&lt;-</span> citibike_sample[<span class="sc">!</span><span class="fu">is.na</span>(volume_group) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(time_period), .(</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">ebike_pct =</span> <span class="fu">mean</span>(rideable_type <span class="sc">==</span> <span class="st">"electric_bike"</span>) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">trips =</span> .N</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>), by <span class="ot">=</span> .(member_casual, volume_group, time_period)]</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>ebike_full[, rider_label <span class="sc">:</span><span class="er">=</span> <span class="fu">ifelse</span>(member_casual <span class="sc">==</span> <span class="st">"casual"</span>, <span class="st">"Casual Riders"</span>, <span class="st">"Members"</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ebike_full, <span class="fu">aes</span>(<span class="at">x =</span> time_period, <span class="at">y =</span> volume_group, <span class="at">fill =</span> ebike_pct)) <span class="sc">+</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(ebike_pct, <span class="dv">1</span>), <span class="st">"%"</span>)),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="fl">4.5</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>rider_label) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">low =</span> <span class="st">"#3498db"</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mid =</span> <span class="st">"#95a5a6"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">high =</span> <span class="st">"#e74c3c"</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">midpoint =</span> <span class="dv">68</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">"E-bike</span><span class="sc">\n</span><span class="st">Usage"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">60</span>, <span class="dv">80</span>),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">60</span>, <span class="dv">80</span>, <span class="dv">5</span>),</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="cf">function</span>(x) <span class="fu">paste0</span>(x, <span class="st">"%"</span>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"E-bike Usage Patterns Across Multiple Dimensions"</span>,</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Blue = More classic bikes | Red = More e-bikes | Overall average = 68% e-bikes"</span>,</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Time of Day"</span>,</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Station Activity Level"</span>,</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Rider Type Distribution: Casual – 22% | Member – 78%"</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="dv">0</span>),</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>, <span class="at">color =</span> <span class="st">"gray30"</span>),</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">9</span>),</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"right"</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="ebike_analysis_full_files/figure-html/heatmap-1.png" class="img-fluid figure-img" width="1152"></p>
+<figcaption>E-bike Usage Patterns Across Multiple Dimensions</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The heatmap reveals several important patterns that support the demand-based interpretation.</p>
+<p><strong>Highest e-bike usage (78.8%)</strong> occurs for casual riders at low-traffic stations during evening rush. This combination represents the ideal conditions for e-bike availability: low-demand stations where e-bikes have not been depleted, ridden by casual users who strongly prefer e-bikes, during evening hours when riders want an easier ride home after a long day.</p>
+<p><strong>Lowest e-bike usage (63.5%)</strong> occurs for members at high-traffic stations during morning rush. This represents the worst conditions for e-bike availability: high-demand stations where e-bikes get taken quickly, used by members who ride frequently during the peak commute period when competition for bikes is most intense.</p>
+<p>The gap between these extremes is 15 percentage points—a substantial difference that cannot be explained by preferences alone. Both casual riders and members show the same general pattern: e-bike usage is higher at low-traffic stations and during evening hours. This consistency across rider types suggests that availability, rather than preference differences, drives the pattern.</p>
+<p>Higher e-bike usage at low-traffic stations and during evening rush suggests that riders prefer the easier ride home after a long day, and e-bikes are actually available to take at these times and locations.</p>
+</section>
+</section>
+<section id="discussion" class="level2">
+<h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
+<section id="implications-for-the-overarching-research-question" class="level3">
+<h3 class="anchored" data-anchor-id="implications-for-the-overarching-research-question">Implications for the Overarching Research Question</h3>
+<p>This analysis contributes to our group’s investigation of which variables most strongly drive Citi Bike trip volume in Manhattan. For bike type choice specifically, the findings suggest that <strong>both infrastructure and external factors matter, but the relationship is complex</strong>.</p>
+<p>Infrastructure affects bike type usage, but not in the direct way initially hypothesized. Better infrastructure does not lead to higher e-bike preference. Instead, infrastructure quality correlates with demand, and demand determines e-bike availability. This is an indirect effect: infrastructure → demand → availability → observed bike type usage.</p>
+<p>External factors also play a role. Rider type creates a consistent 6-7 percentage point gap in e-bike usage, with casual riders preferring e-bikes more than members. Time of day creates variation, with evening hours showing higher e-bike usage than morning hours. However, these external factors operate on top of the availability constraint—they shift the baseline but do not override the supply limitation.</p>
+</section>
+<section id="limitations" class="level3">
+<h3 class="anchored" data-anchor-id="limitations">Limitations</h3>
+<p>Several limitations should be acknowledged when interpreting these findings.</p>
+<p>First, this analysis cannot directly measure e-bike availability at the moment of each trip. The inference that high-infrastructure areas have depleted e-bikes is based on patterns in the data rather than direct observation of bike inventories. Citi Bike does collect real-time station status data, and future research incorporating this information could test the availability hypothesis more directly by examining whether stations with low e-bike inventory at a given moment show correspondingly low e-bike trip rates.</p>
+<p>Second, the infrastructure score combines only two metrics—station density and bike lane proximity. Other factors that might influence cycling comfort and safety, such as traffic volume, road surface conditions, topography and hills, or the presence of dedicated bike signals, are not captured in this classification. A more comprehensive infrastructure assessment might reveal additional nuances in the relationship between cycling environment and bike type choice.</p>
+<p>Third, the 5% sample, while stratified by date to ensure temporal representativeness, may not perfectly capture all usage patterns. Smaller stations with fewer trips have higher sampling variance, and rare events or unusual patterns might not be adequately represented. However, the large absolute sample size (over 80,000 trips) and the consistency of findings across multiple analytical approaches provide reasonable confidence in the overall conclusions.</p>
+<p>Fourth, this analysis focuses exclusively on Manhattan, which has unique characteristics—high density, extensive transit alternatives, and heavy tourist traffic—that may not generalize to other urban areas or even to the outer boroughs of New York City. The relationship between infrastructure and bike type usage might differ in areas with lower overall cycling demand or different demographic compositions.</p>
+</section>
+<section id="recommendations" class="level3">
+<h3 class="anchored" data-anchor-id="recommendations">Recommendations</h3>
+<p>Based on these findings, several recommendations emerge for bike-share operators and urban planners.</p>
+<p>For operators, the key insight is that e-bike supply does not keep pace with demand at high-traffic stations. More aggressive rebalancing of e-bikes to popular locations, particularly during morning hours, could improve e-bike availability where demand is highest. This might involve predictive algorithms that anticipate demand patterns and pre-position e-bikes before peak periods, or incentive programs that encourage riders to return e-bikes to high-demand stations. Given that members—the most frequent riders—are most affected by e-bike shortages, improving availability could enhance the value proposition of membership and increase rider satisfaction.</p>
+<p>For planners, the finding that infrastructure correlates with demand rather than directly influencing bike type choice suggests that infrastructure investments should focus on network expansion and coverage rather than expecting infrastructure improvements to shift bike type preferences. Adding stations in underserved areas may be more impactful than upgrading infrastructure around existing busy stations, at least from the perspective of bike type equity.</p>
+<p>Additionally, as cities consider the integration of e-bikes into their cycling networks, this analysis highlights the importance of viewing e-bikes as a capacity management challenge rather than simply an infrastructure challenge. The physical infrastructure—bike lanes, station docks, road conditions—creates the context for cycling, but operational decisions about fleet composition and rebalancing ultimately determine what bikes are available to riders at any given moment.</p>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>This analysis examined how station infrastructure relates to e-bike vs classic bike usage in Manhattan’s Citi Bike system. The key finding is counterintuitive: high-infrastructure areas show <em>lower</em> e-bike usage, not higher. This result challenges the simple assumption that better cycling infrastructure leads to greater adoption of premium bike options.</p>
+<p>This inverse relationship is best explained by demand dynamics rather than infrastructure quality per se. High-infrastructure areas are also high-demand areas, and e-bikes—being generally preferred by riders—get depleted faster at busy stations. Riders at high-traffic stations are more likely to be “forced” onto classic bikes simply because e-bikes are not available when they arrive, not because they prefer classic bikes or because the infrastructure is unsuitable for e-bikes.</p>
+<p>The pattern holds consistently across rider types and times of day, with the most extreme differences appearing between casual riders at low-traffic evening stations (78.8% e-bike) and members at high-traffic morning stations (63.5% e-bike). This 15 percentage point gap represents a substantial disparity in access to preferred bike types based on when and where people ride.</p>
+<p>For our group’s overarching question about which variables most strongly drive Citi Bike usage in Manhattan, this analysis shows that for bike type choice, infrastructure matters—but indirectly. It shapes demand patterns, which in turn determine e-bike availability. External factors like rider type and time of day create additional variation but operate within the constraints set by supply and demand dynamics.</p>
+<p>The findings suggest that improving e-bike availability at high-demand locations may require operational interventions (better rebalancing and fleet management) rather than infrastructure investments alone. Infrastructure builds the network that attracts riders; operations must then manage the resulting demand to ensure equitable access to preferred bike types across all neighborhoods and times of day.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sabrinazhuu\.github\.io\/STA9750-2025-FALL\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
