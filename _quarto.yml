@@ -1,0 +1,35 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "STA 9750 Submission Material"
+  description: "Course Projects for STA 9750 at Baruch College"
+  site-url: "https://sabrinazhuu.github.io/STA9750-2025-FALL/"
+  navbar:
+    background: primary
+    search: false
+    right: 
+      - text: "Projects"
+        menu:
+        - text: "01 - Exploring the Most Popular Programming on Netflix"
+          href: "./mp01.html"
+        - text: "02 - Making Backyards Affordable for All"
+          href: "./mp02.html"
+        - text: "03 - Visualizing and Maintaining the Green Canopy of NYC"
+          href: "./mp03.html"
+        - text: "04 - Just the Fact(-Check)s, Ma'am!"
+          href: "./mp04.html"
+
+format:
+  html:
+    theme: zephyr
+    css: style.css
+    toc: true
+    toc-title: "On this page"
+    toc-location: right
+    code-fold: true
+    code-summary: "Show the code"
+
+editor:
+  mode: source
